@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<datastore-indexes
+  autoGenerate="true">
+
+<!-- 
+	<datastore-index kind="BlogEntry" ancestor="false" source="manual">
+        <property name="blogKey" direction="asc"/>
+        <property name="pubDate" direction="asc"/>
+    </datastore-index>
+ -->
+</datastore-indexes>

@@ -1,0 +1,1 @@
+<img src="/img/ok.png"/> welcome !

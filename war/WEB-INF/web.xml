@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+
+
+	<servlet>
+		<servlet-name>TalkFeed</servlet-name>
+		<servlet-class>talkfeed.TalkFeedServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>TalkFeed</servlet-name>
+		<url-pattern>/_ah/xmpp/message/chat/</url-pattern>
+	</servlet-mapping>
+	
+	
+	<servlet>
+		<servlet-name>tasks</servlet-name>
+		<servlet-class>talkfeed.TaskServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>tasks</servlet-name>
+		<url-pattern>/tasks/*</url-pattern>
+	</servlet-mapping>
+	
+	<!-- SPRING 3.0 -->
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+	
+	
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	<jsp-config>
+	<jsp-property-group>
+			<description>Toutes les pages</description>
+			
+			<url-pattern>/WEB-INF/views/page/*</url-pattern>
+			<el-ignored>false</el-ignored>
+			<page-encoding>ISO-8859-1</page-encoding>
+			<include-prelude>/WEB-INF/jspf/start.jspf</include-prelude>
+			<include-coda>/WEB-INF/jspf/end.jspf</include-coda>
+		</jsp-property-group>
+	</jsp-config>
+</web-app>

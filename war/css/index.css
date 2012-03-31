@@ -1,0 +1,64 @@
+a{
+	color:blue;
+	text-decoration: none;
+}
+
+a:HOVER {
+	text-decoration: underline;
+	color: red;
+}
+
+body{
+	margin:0px;
+	padding:0px;
+	margin: 0; /* pour éviter les marges */ 
+	text-align: center; /* pour corriger le bug de centrage IE */ 
+	font-family: "Calibri","Arial";
+	background-color: #FAFAFA;
+}
+
+
+#main{
+	text-align: left; /* on rétablit l'alignement normal du texte */ 
+	margin-left:auto;
+	margin-right:auto;
+	width:600px;
+	height:100%;
+	background: #FFFFFF;
+	padding:8px;
+	border-left:solid 1px #DADADA;
+	border-right:solid 1px #DADADA;
+	background-color: #FFFFFF;
+}
+
+
+.block{
+	font-family: "Calibri","Arial";
+	font-size:20px;
+	border-bottom:1px solid green;
+	padding-bottom:10px;
+	margin-bottom:10px;
+	}
+
+.blog{
+	font-size:18px;
+	border-bottom:1px dashed  #DADADA;
+}
+.lastDate{
+	font-size:14px;
+	color:#656565;
+}
+
+.posts {
+	margin-left:10px;
+	width:86%;
+	border-left:1px dotted #CACACA;
+	border-right:1px dotted #CACACA;
+	padding-left:10px;
+	background: #FAFAFA;
+}
+
+.post {
+
+	border-bottom:1px solid #DADADA;
+}
