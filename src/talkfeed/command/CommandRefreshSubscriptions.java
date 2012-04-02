@@ -17,7 +17,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.SubscriptionService;
+import talkfeed.UserService;
 
 /**
  * Refresh user subscriptions
@@ -27,13 +27,17 @@ import talkfeed.SubscriptionService;
 @CommandType("refreshsubscriptions")
 public class CommandRefreshSubscriptions implements Command {
 
-	private static final int NB_MAX = 40;
+	private static final int NB_MAX = 10;
 	
 	@Override
 	public void execute(Map<String, String> args) {
 		
+		/*
 		SubscriptionService serv = new SubscriptionService();
-		serv.sendNotifications(NB_MAX );
+		serv.sendNotifications(NB_MAX ); */
+		
+		UserService serv = new UserService();
+		serv.updateUsers(NB_MAX);
 		
 	}
 
