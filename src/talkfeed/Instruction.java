@@ -16,6 +16,7 @@
 
 package talkfeed;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +40,7 @@ public class Instruction{
 		= Arrays.asList(new String [] { "start","stop","pause" ,"on","off" ,"every","purge"});
 	private static final List<String> codesForManagingBlogs 
 		= Arrays.asList(new String [] {"add","remove","del","next","say","list","back"});
-	private static List<String> arrayString;
+	private static ArrayList<String> arrayString;
 	
 	private Message message;
 	private Map<String,String> params;
@@ -66,7 +67,8 @@ public class Instruction{
 		
 		//build array list containing all commands
 		if (arrayString == null){
-			arrayString = codesForAccount;
+			arrayString = new ArrayList<String>();
+			arrayString.addAll(codesForAccount);
 			arrayString.addAll(codesForManagingBlogs);
 		}
 

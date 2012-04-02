@@ -122,7 +122,7 @@ public class BlogService {
 		
 		PersistenceManager pm = dm.newPersistenceManager();
 		
-		//find blogs, ordered bu "nextUpdate" date
+		//find blogs, ordered by "nextUpdate" date
 		Query q = pm.newQuery(Blog.class);
 		q.setRange(0, nbMax);
 		q.setFilter("nextUpdate <= date");
@@ -165,12 +165,15 @@ public class BlogService {
 		
 		//check if blog has any updates
 		boolean hasUpdate = false;
-		//fetch channel
+		
+		//fetch channel on the web via RSS
 		Channel chan = FeedManager.loadRss(blog.getRss());
 		
 		if (chan != null){
+			//update blog. Returns true if new items were added
 			hasUpdate = updateBlog(pm, blog, chan);
-			//test right url and title
+			
+			//test url and title and correct if worng
 			if (chan.getLink() != null && !chan.getLink().equalsIgnoreCase(blog.getLink())){
 				blog.setLink(chan.getLink());
 			}
@@ -285,13 +288,35 @@ public class BlogService {
 	 * update entries for a blog with given channel
 	 * @param blog
 	 * @param chan
-	 * @return True if any change has occured
+	 * @return True if any change has occured (new items found)
 	 */
 	private boolean updateBlog(PersistenceManager pm ,Blog blog, Channel chan){
 		
-		//TODO save datastore request
 		
 		boolean newUpdates = false;
+		
+		Date recentDate = null;
+		
+		//find max entry
+		Query queryMostRecentEntry = pm.newQuery(BlogEntry.class);
+		queryMostRecentEntry.setFilter("blogKey == bk");
+		queryMostRecentEntry.declareParameters("com.google.appengine.api.datastore.Key bk");
+		queryMostRecentEntry.setOrdering("pubDate desc");
+		queryMostRecentEntry.setRange(0, 1);
+		
+		//fetch most recent entry by pubDate to test "pubDate"
+		@SuppressWarnings("unchecked")
+		List<BlogEntry> listMostRecentEntry = (List<BlogEntry>) queryMostRecentEntry.execute(blog.getKey());
+		BlogEntry mostRecentEntry = null;
+		if (listMostRecentEntry.size() > 0) mostRecentEntry = listMostRecentEntry.get(0);
+		
+		if (mostRecentEntry != null) {
+			recentDate = mostRecentEntry.getPubDate();
+		} else {
+			Calendar c = Calendar.getInstance();
+			c.set(Calendar.YEAR,1900);
+			recentDate = c.getTime();
+		}
 		
 		//compare item
 		for(FeedItem item : chan.itemsOrderByDate()){
@@ -299,19 +324,22 @@ public class BlogService {
 			//parse error
 			if (item.getLink() == null) continue;
 			
-			//find by guid
-			Query q = pm.newQuery(BlogEntry.class);
-			q.setFilter("guid == g");
-			q.declareParameters("java.lang.String g");
-			q.setUnique(true);
+			//set creaDate
+			Date pubDate = item.getPubDate();
+			if (pubDate == null) pubDate = Calendar.getInstance().getTime();
 			
-			BlogEntry entry = (BlogEntry) q.execute(item.getGuid());
+			//date
+			if(recentDate.after(pubDate)) continue;
+			
+			//find by guid
+			Query queryBlogEntry = pm.newQuery(BlogEntry.class);
+			queryBlogEntry.setFilter("guid == g");
+			queryBlogEntry.declareParameters("java.lang.String g");
+			queryBlogEntry.setUnique(true);
+			
+			BlogEntry entry = (BlogEntry) queryBlogEntry.execute(item.getGuid());
 			
 			if (entry == null){
-				//set creaDate
-				Date pubDate = item.getPubDate();
-				if (pubDate == null) pubDate = Calendar.getInstance().getTime();
-				
 				//new item
 				entry = new BlogEntry();
 				entry.setBlogKey(blog.getKey());
