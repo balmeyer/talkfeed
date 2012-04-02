@@ -44,8 +44,11 @@ public class TalkFeedServlet extends HttpServlet {
 		Message message = TalkService.parseMessage(req);
 		
 		//dispatch message
+		/*OLD
 		Dispatcher dispatcher = new Dispatcher();
-		dispatcher.dispatch(message);
+		dispatcher.dispatch(message);*/
+		
+		Dispatcher.getInstance().dispatch(message);
 		
 
 	}

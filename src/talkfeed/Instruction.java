@@ -16,7 +16,7 @@
 
 package talkfeed;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +24,7 @@ import java.util.Map;
 import talkfeed.utils.TextTools;
 
 import com.google.appengine.api.xmpp.Message;
-import com.google.appengine.repackaged.com.google.common.collect.Lists;
+
 
 
 /**
@@ -35,10 +35,10 @@ import com.google.appengine.repackaged.com.google.common.collect.Lists;
 public class Instruction{
 	
 	//accepted instruct
-	private static final ArrayList<String> codesForAccount 
-		= Lists.newArrayList(new String [] { "start","stop","pause" ,"on","off" ,"every","purge"});
-	private static final ArrayList<String> codesForManagingBlogs 
-		= Lists.newArrayList(new String [] {"add","remove","del","next","say","list","back"});
+	private static final List<String> codesForAccount 
+		= Arrays.asList(new String [] { "start","stop","pause" ,"on","off" ,"every","purge"});
+	private static final List<String> codesForManagingBlogs 
+		= Arrays.asList(new String [] {"add","remove","del","next","say","list","back"});
 	private static List<String> arrayString;
 	
 	private Message message;
@@ -64,9 +64,9 @@ public class Instruction{
 		
 		String mainArg = words[0].toLowerCase();
 		
-		//build array list containg all commands
+		//build array list containing all commands
 		if (arrayString == null){
-			arrayString = Lists.newArrayList(codesForAccount);
+			arrayString = codesForAccount;
 			arrayString.addAll(codesForManagingBlogs);
 		}
 

@@ -32,12 +32,24 @@ import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.google.appengine.api.xmpp.Message;
 
 /**
- * Dispatch message
+ * Dispatch XMPP message
  * @author Balmeyer
  *
  */
 public class Dispatcher {
 
+	private static Dispatcher instance ;
+	
+	public static Dispatcher getInstance(){
+		if (instance == null) instance = new Dispatcher();
+		return instance;
+	}
+	
+	/**
+	 * No public constructor
+	 */
+	private Dispatcher(){}
+	
 	/**
 	 * dispatch XMPP message
 	 * @param msg
