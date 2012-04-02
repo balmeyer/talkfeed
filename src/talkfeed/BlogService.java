@@ -348,6 +348,7 @@ public class BlogService {
 				entry.setGuid(item.getGuid());
 				entry.setLink(item.getLink());
 				entry.setTitle(item.getTitle());
+				entry.setBlogTitle(chan.getTitle());
 				pm.makePersistent(entry);
 				newUpdates = true;
 			}

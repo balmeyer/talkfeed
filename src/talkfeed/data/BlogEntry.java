@@ -57,6 +57,10 @@ public class BlogEntry {
 	@Persistent
 	private String shortLink;
 	
+	//denormalized to save datastore access
+	@Persistent
+	private String blogTitle;
+	
 	public void setKey(Key key) {
 		this.key = key;
 	}
@@ -125,5 +129,13 @@ public class BlogEntry {
 
 	public void setShortLink(String shortLink) {
 		this.shortLink = shortLink;
+	}
+
+	public String getBlogTitle() {
+		return blogTitle;
+	}
+
+	public void setBlogTitle(String blogTitle) {
+		this.blogTitle = blogTitle;
 	}
 }

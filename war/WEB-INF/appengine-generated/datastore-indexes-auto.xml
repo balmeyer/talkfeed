@@ -1,4 +1,11 @@
-<!-- Indices written at Mon, 2 Apr 2012 20:37:11 UTC -->
+<!-- Indices written at Mon, 2 Apr 2012 22:08:32 UTC -->
 
-<datastore-indexes/>
+<datastore-indexes>
 
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="Subscription" ancestor="false" source="auto">
+        <property name="userKey" direction="asc"/>
+        <property name="lastProcessDate" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>

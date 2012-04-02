@@ -135,6 +135,7 @@ public class SubscriptionService {
 	 * 
 	 * @param user
 	 */
+	@Deprecated
 	public void sendNotifications(User user) {
 		if (user == null)
 			return;
@@ -430,6 +431,7 @@ public class SubscriptionService {
 	 * @param k
 	 * @return
 	 */
+	@Deprecated
 	private String getBlogTitle(PersistenceManager pm, BlogEntry be) {
 
 		if (be == null)

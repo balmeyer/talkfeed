@@ -25,6 +25,11 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 
+/**
+ * Subscription of a User to a Blog
+ * @author vovau
+ *
+ */
 @PersistenceCapable
 public class Subscription {
 
@@ -97,7 +102,7 @@ public class Subscription {
 	}
 
 	/**
-	 * Last read date
+	 * Last read date of user
 	 * @return
 	 */
 	public Date getLastDate() {
@@ -108,6 +113,10 @@ public class Subscription {
 		this.lastProcessDate = lastProcessDate;
 	}
 
+	/**
+	 * Date of the last entry notified to user
+	 * @return
+	 */
 	public Date getLastProcessDate() {
 		return lastProcessDate;
 	}
