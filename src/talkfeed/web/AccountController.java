@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import talkfeed.blog.SubscriptionService;
+import talkfeed.SubscriptionService;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;

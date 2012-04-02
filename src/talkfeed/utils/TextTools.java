@@ -116,7 +116,7 @@ public class TextTools {
 			if (link.indexOf('"') >= 0) {
 				link = link.substring(0, link.indexOf('"')).replace("\"", "");
 			} else {
-				// TODO enlever ça
+				// TODO remove this
 				link = link + "";
 			}
 
@@ -125,7 +125,7 @@ public class TextTools {
 			return link;
 		}
 
-		// rien trouvé
+		//nothing found
 		return null;
 	}
 

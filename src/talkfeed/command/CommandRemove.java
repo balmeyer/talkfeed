@@ -19,7 +19,7 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
-import talkfeed.blog.SubscriptionService;
+import talkfeed.SubscriptionService;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;

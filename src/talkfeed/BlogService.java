@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-package talkfeed.blog;
+package talkfeed;
 
 import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
 
@@ -25,6 +25,9 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import talkfeed.blog.Channel;
+import talkfeed.blog.FeedItem;
+import talkfeed.blog.FeedManager;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
@@ -39,30 +42,30 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
 
 /**
- * Managing web sources.
+ * Managing web sources update.
  * 
  * @author JBVovau
  * 
  */
-public class BlogManager {
+public class BlogService {
 
 	/**
 	 * Get instance of BlogManager
 	 * @return
 	 */
-	public static BlogManager getInstance() {
-		return new BlogManager();
+	public static BlogService getInstance() {
+		return new BlogService();
 	}
 
 	/** No public instance */
-	private BlogManager() {
+	private BlogService() {
 	}
 
 	/**
-	 * get or create web source from given link (could be RSS, atom or Web url)
+	 * get or create web source from given link (could be RSS, atom or URL)
 	 */
 	public Blog getOrCreateSource(String link) {
-		//improve link
+		//arrange or prepare link
 		link = TextTools.purgeLink(link);
 		
 		// check blog from link
@@ -70,14 +73,16 @@ public class BlogManager {
 		Blog blog = dm.getBlogFromLink(link);
 
 		if (blog == null) {
+			//blog does not exist : load content to parse it
 			String content = DocumentLoader.loadPage(link);
  
 			String rss = null; 
 			
-			//test if link given is already RSS or Atom FEED
+			//test if given link is already RSS or Atom FEED
 			if (FeedManager.isFeed(content)){
 				rss = link;
 			}else {
+				//extract RSS link from blog content
 				rss = TextTools.extractRssFromPage(content);
 			}
 
@@ -108,7 +113,7 @@ public class BlogManager {
 
 
 	/**
-	 * Update channels from blogs
+	 * Update feed's blogs.
 	 */
 	public void updateBlogs(int nbMax){
 		if (nbMax <=0) return;
@@ -138,17 +143,8 @@ public class BlogManager {
 			.method(Method.GET)
 			.param("id", String.valueOf(blog.getKey().getId()));
 			
-			
-			//add to Queue
-			
+			//add to GAE Queue
 			queue.add(options);
-			
-			/*
-			queue.add(
-					withUrl("/tasks/updateblog")
-					.method(Method.GET)
-					.param("id", String.valueOf(blog.getKey().getId())
-				));*/
 		}
 		
 		
@@ -182,9 +178,7 @@ public class BlogManager {
 			if (chan.getTitle() != null && !chan.getTitle().equalsIgnoreCase(blog.getTitle())){
 				blog.setTitle(chan.getTitle());
 			}
-		} else {
-			
-		}
+		} 
 		
 		//set update date
 		if (hasUpdate) blog.setLastUpdate(new Date());
@@ -294,6 +288,8 @@ public class BlogManager {
 	 * @return True if any change has occured
 	 */
 	private boolean updateBlog(PersistenceManager pm ,Blog blog, Channel chan){
+		
+		//TODO save datastore request
 		
 		boolean newUpdates = false;
 		

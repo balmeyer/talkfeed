@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-package talkfeed.blog;
+package talkfeed;
 
 import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
 

@@ -17,7 +17,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.blog.SubscriptionService;
+import talkfeed.SubscriptionService;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
 

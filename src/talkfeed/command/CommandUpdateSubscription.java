@@ -17,7 +17,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.blog.SubscriptionService;
+import talkfeed.SubscriptionService;
 
 @CommandType("updatesubscription")
 public class CommandUpdateSubscription implements Command{

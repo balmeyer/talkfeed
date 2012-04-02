@@ -19,7 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import talkfeed.blog.BlogManager;
+import talkfeed.BlogService;
 import talkfeed.data.Blog;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
@@ -42,7 +42,7 @@ public class CommandAddSource implements Command {
 		String id = args.get("id");
 		String link = args.get("link");
 		
-		BlogManager blogManager = BlogManager.getInstance();
+		BlogService blogManager = BlogService.getInstance();
 		DataManager dataManager = DataManagerFactory.getInstance();
 		
 		//get user

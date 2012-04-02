@@ -18,7 +18,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.blog.BlogManager;
+import talkfeed.BlogService;
 
 /**
  * Task for removing unused blogs
@@ -33,7 +33,7 @@ public class CommandPurgeBlogs implements Command {
 		
 		//TODO fix this bug : oldest entries removed => push again
 		
-		BlogManager bm = BlogManager.getInstance();
+		BlogService bm = BlogService.getInstance();
 		
 		int nb = bm.removeBlogWithoutSubscription();
 		System.out.println(nb + " blog(s) removed");

@@ -52,6 +52,7 @@ public class CommandFactory {
 			Command instance = null;
 			try {
 				instance = claz.newInstance();
+				typeToCommand.put(ctype.value() , instance);
 			} catch (InstantiationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -59,7 +60,7 @@ public class CommandFactory {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			typeToCommand.put(ctype.value() , instance);
+			
 		}
 		
 	}
