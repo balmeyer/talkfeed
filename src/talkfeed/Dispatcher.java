@@ -33,7 +33,7 @@ import com.google.appengine.api.xmpp.Message;
 
 /**
  * Dispatch message
- * @author JBVovau
+ * @author Balmeyer
  *
  */
 public class Dispatcher {
