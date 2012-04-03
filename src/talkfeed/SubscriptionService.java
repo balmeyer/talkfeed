@@ -199,6 +199,7 @@ public class SubscriptionService {
 	 * 
 	 * @return
 	 */
+	@Deprecated
 	private UrlShorten getUrlShorten() {
 		if (urlShorten == null)
 			this.urlShorten = UrlShortenFactory.getInstance();
