@@ -173,6 +173,7 @@ public class UserService {
 					pm.flush();
 					pm.currentTransaction().commit();
 					break;
+					
 				}
 				
 				
@@ -191,6 +192,7 @@ public class UserService {
 
 	/**
 	 * Notify new BlogEntry to user and get new "last blogEntry date"
+	 * return null if no entry is needed
 	 * 
 	 * @param pm
 	 * @param sub
@@ -200,6 +202,7 @@ public class UserService {
 	private Date notifySubscriptionAndReturnLastDate(PersistenceManager pm,
 			Subscription sub, JID jabberId) {
 
+		//Date now = Calendar.getInstance().getTime();
 		Date newDate = null;
 
 		// find oldest entry from blog subscription which haven't been sent
@@ -210,6 +213,7 @@ public class UserService {
 		q.setUnique(true);
 		q.setRange(0, 1);
 
+		//find blog entry
 		BlogEntry entryToPush = (BlogEntry) q.execute(sub.getBlogKey(),
 				sub.getLastDate());
 

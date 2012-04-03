@@ -78,7 +78,6 @@ public class CommandFactory {
 			CommandAccount.class,
 			CommandSay.class,
 			CommandUpdateBlog.class,
-			CommandUpdateSubscription.class,
 			CommandPurge.class,
 			CommandRemove.class,
 			CommandPurgeBlogs.class,
