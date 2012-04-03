@@ -1,6 +1,7 @@
 package talkfeed.command;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +50,15 @@ public class CommandBack implements Command {
 		//number of minutes to rollback
 		minutes = minutes * coef;
 		
+		//got to last pubDate
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MINUTE, -minutes);
+		Date lastPubDate = cal.getTime();
+		
+		//last process date
+		Calendar cal2 = Calendar.getInstance();
+		cal2.add(Calendar.HOUR, -24);
+		Date lastProcess = cal2.getTime();
 		
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
@@ -67,8 +75,10 @@ public class CommandBack implements Command {
 		
 		for(Subscription s : list){
 			pm.currentTransaction().begin();
-			s.setLastDate(cal.getTime());
+			s.setLastDate(lastPubDate);
+			s.setLastProcessDate(lastProcess);
 			pm.currentTransaction().commit();
+			//TODO do something about lastProcessDate to push
 		}
 		
 		pm.flush();
