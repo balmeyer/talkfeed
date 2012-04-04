@@ -62,6 +62,8 @@ public class UserService {
 
 		//TMP transition
 		//TODO remove when ok
+		/*
+		 * data correction for version 0.6.1
 		Query qall = pm.newQuery(User.class);
 		List<User> all = (List<User>) qall.execute();
 		for(User us : all){
@@ -72,7 +74,7 @@ public class UserService {
 				pm.currentTransaction().commit();
 			}
 			
-		}
+		}*/
 		
 		//find user
 		Query q = pm.newQuery(User.class);
