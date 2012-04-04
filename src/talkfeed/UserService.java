@@ -52,59 +52,55 @@ import com.google.appengine.api.xmpp.Presence;
 public class UserService {
 
 	private static final String USERMARK_ID = "1";
-	private static final int NB_SUBSCRIPTION_MAX = 15;
+	private static final int NB_SUBSCRIPTION_MAX = 20;
 	
 	public void updateUsers(int nbMax){
 		
+		Date now = Calendar.getInstance().getTime();
+		
 		PersistenceManager pm = DataManagerFactory.getInstance().newPersistenceManager();
-		
-		//find mark
-		long lastId = 1;
-		Query qm = pm.newQuery(UserMark.class);
-		qm.setRange(0, 1);
-		qm.setUnique(true);
-		UserMark um = (UserMark) qm.execute();
-		if (um == null){
-			um = new UserMark();
-			um.setId(USERMARK_ID);
-			um.setLastId(1);
-			pm.makePersistent(um);
+
+		//TMP transition
+		//TODO remove when ok
+		Query qall = pm.newQuery(User.class);
+		List<User> all = (List<User>) qall.execute();
+		for(User us : all){
+			if (us.getNextUpdate() == null) {
+				us.setNextUpdate(now);
+				pm.currentTransaction().begin();
+				pm.flush();
+				pm.currentTransaction().commit();
+			}
+			
 		}
-		
-		lastId = um.getLastId();
-		if (lastId <1) lastId = 1;
 		
 		//find user
 		Query q = pm.newQuery(User.class);
-		q.setFilter("key >= lastId");
-		q.setOrdering("key");
-		q.declareParameters("Long lastId");
+		q.setFilter("nextUpdate <= next");
+		q.setOrdering("nextUpdate");
+		q.declareParameters("java.util.Date next");
 		q.setRange(0 , nbMax);
 		
 		//list user
-		boolean hasListed = false;
-		List<User> list = (List<User>) q.execute(lastId);
+		List<User> list = (List<User>) q.execute(now);
 		
-		for(User u : list) {
+		for(User user : list) {
+
 			//ask for update
 			Queue queue = QueueFactory.getDefaultQueue();
 
 			TaskOptions options = withUrl("/tasks/updateuser")
 					.method(Method.GET).param("id",
-							String.valueOf(u.getKey().getId()));
+							String.valueOf(user.getKey().getId()));
 
 			// add to Queue
 			queue.add(options);
 			
-			hasListed = true;
-			lastId = u.getKey().getId() + 1;
 		}
-		
-		//no one listed : start to beginning
-		if (!hasListed) lastId = 1;
+
 		
 		//end of process
-		um.setLastId(lastId);
+		q.closeAll();
 		pm.flush();
 		pm.close();
 		
@@ -117,11 +113,18 @@ public class UserService {
 	public void updateUser(long id){
 		//nowaday
 		Date now = Calendar.getInstance().getTime();
-		
+
 		//find user
 		PersistenceManager pm = DataManagerFactory.getInstance().newPersistenceManager();
 		
 		User user = (User) pm.getObjectById(User.class, id);
+		
+
+		
+		//next update
+		int minuteNextUpdate = user.getInterval() ;
+		if (minuteNextUpdate <10) minuteNextUpdate = 10;
+
 		
 		// test user presence
 		JID jid = new JID(user.getId());
@@ -130,20 +133,15 @@ public class UserService {
 		if (presence != null && presence.isAvailable()){
 			//update !
 			
-			//acceptable date
-			Calendar acdate = Calendar.getInstance();
-			acdate.add(Calendar.HOUR, -1);
-			Date acceptableDate = acdate.getTime();
-			
 			// select subscriptions
 			Query q = pm.newQuery(Subscription.class);
 			q.setOrdering("lastProcessDate");
 			q.setRange(0, NB_SUBSCRIPTION_MAX);
-			q.setFilter("userKey == uk && lastProcessDate < date");
-			q.declareParameters("com.google.appengine.api.datastore.Key uk, java.util.Date date");
+			q.setFilter("userKey == uk");
+			q.declareParameters("com.google.appengine.api.datastore.Key uk");
 
 			@SuppressWarnings("unchecked")
-			List<Subscription> subs = (List<Subscription>) q.execute(user.getKey(),acceptableDate);
+			List<Subscription> subs = (List<Subscription>) q.execute(user.getKey());
 
 			//update
 			for(Subscription sub : subs){
@@ -175,18 +173,28 @@ public class UserService {
 					break;
 					
 				}
-				
-				
+			
 			}
 			
-			//flush
-			//pm.currentTransaction().begin();
-			//pm.flush();
-			//pm.currentTransaction().commit();
 			q.closeAll();
-			pm.close();
 			
+		} else {
+			minuteNextUpdate = 20;
 		}
+		
+		//next update
+		//record next update
+		Calendar nextTime = Calendar.getInstance();
+		nextTime.add(Calendar.MINUTE, minuteNextUpdate);
+		user.setNextUpdate(nextTime.getTime());
+		
+		//flush
+		pm.currentTransaction().begin();
+		pm.flush();
+		pm.currentTransaction().commit();
+		
+		
+		pm.close();
 	}
 	
 

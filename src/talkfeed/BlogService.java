@@ -33,6 +33,7 @@ import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
+import talkfeed.data.User;
 import talkfeed.utils.DocumentLoader;
 import talkfeed.utils.TextTools;
 
@@ -278,6 +279,10 @@ public class BlogService {
 			pm.currentTransaction().commit();
 			nb++;
 		}
+		
+		
+
+
 		
 		pm.close();
 		

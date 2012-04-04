@@ -47,8 +47,11 @@ public class User {
 	@Persistent
 	private Date dateCrea;
    
-  @Persistent
+	@Persistent
 	private Date lastUpdate;
+	
+	@Persistent
+	private Date nextUpdate;
 	
 	public void setKey(Key key) {
 		this.key = key;
@@ -129,6 +132,18 @@ public class User {
 
 	public void setLastUpdate(Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
+	}
+
+	/**
+	 * Next time user must be notified
+	 * @return
+	 */
+	public Date getNextUpdate() {
+		return nextUpdate;
+	}
+
+	public void setNextUpdate(Date nextUpdate) {
+		this.nextUpdate = nextUpdate;
 	}
 
 }

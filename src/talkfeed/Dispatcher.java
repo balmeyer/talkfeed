@@ -18,6 +18,7 @@ package talkfeed;
 
 import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import talkfeed.data.DataManager;
@@ -67,6 +68,7 @@ public class Dispatcher {
 			user = new User();
 			user.setId(jid);
 			user.setDateCrea(new Date());
+			user.setNextUpdate(new Date());
 			dm.save(user);
 		}
 		
