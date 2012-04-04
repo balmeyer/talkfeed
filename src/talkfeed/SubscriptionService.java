@@ -152,6 +152,12 @@ public class SubscriptionService {
 		return true;
 	}
 
+	/**
+	 * Remove subscription
+	 * @param email
+	 * @param blogId
+	 * @return
+	 */
 	public boolean removeSubscription(String email, long blogId) {
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
