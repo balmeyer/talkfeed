@@ -22,7 +22,7 @@ import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
-import talkfeed.talk.TalkService;
+import talkfeed.gtalk.TalkService;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.User;

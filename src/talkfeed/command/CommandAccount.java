@@ -19,7 +19,7 @@ import java.util.Map;
 
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
-import talkfeed.talk.TalkService;
+import talkfeed.gtalk.TalkService;
 
 /**
  * manning account

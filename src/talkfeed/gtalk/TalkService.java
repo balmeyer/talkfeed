@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package talkfeed.talk;
+package talkfeed.gtalk;
 
 import java.io.IOException;
 
@@ -86,6 +86,23 @@ public class TalkService {
 	public static final Message parseMessage(HttpServletRequest req) throws IOException{
 		XMPPService xmpp = XMPPServiceFactory.getXMPPService();
 		return xmpp.parseMessage(req);
+	}
+	
+	/**
+	 * Send notification
+	 * @param notif
+	 */
+	public static final void sendMessage(GTalkBlogNotification notif){
+		StringBuilder sb = new StringBuilder();
+		sb.append('[');
+		sb.append(notif.getBlogTitle());
+		sb.append("] ");
+		sb.append(notif.getPostTitle());
+		sb.append(" : ");
+		sb.append(notif.getPostUrl());
+
+		// send message
+		sendMessage(notif.getJabberID(), sb.toString());
 	}
 	
 }

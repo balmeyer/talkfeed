@@ -26,7 +26,7 @@ import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
-import talkfeed.talk.TalkService;
+import talkfeed.gtalk.TalkService;
 
 /**
  * Purge all pending entries in queue for one user

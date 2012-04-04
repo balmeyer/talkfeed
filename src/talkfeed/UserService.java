@@ -32,7 +32,8 @@ import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
 import talkfeed.data.UserMark;
-import talkfeed.talk.TalkService;
+import talkfeed.gtalk.GTalkBlogNotification;
+import talkfeed.gtalk.TalkService;
 import talkfeed.url.UrlShortenFactory;
 import talkfeed.utils.CacheService;
 
@@ -249,16 +250,16 @@ public class UserService {
 			//TODO remove this when production
 			if (blogTitle == null) blogTitle = getBlogTitle(pm, entryToPush);
 					
-			StringBuilder sb = new StringBuilder();
-			sb.append('[');
-			sb.append(blogTitle);
-			sb.append("] ");
-			sb.append(entryToPush.getTitle());
-			sb.append(" : ");
-			sb.append(link);
+			//build notification
+			GTalkBlogNotification notif = new GTalkBlogNotification();
+			notif.setBlogTitle(blogTitle);
+			notif.setJabberID(jabberId);
+			notif.setPostTitle(entryToPush.getTitle());
+			notif.setPostUrl(link);
+			//send notif
+			TalkService.sendMessage(notif);
+			
 
-			// send message
-			TalkService.sendMessage(jabberId, sb.toString());
 			// mark last show date
 
 			newDate = entryToPush.getPubDate();

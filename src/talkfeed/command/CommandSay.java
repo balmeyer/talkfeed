@@ -2,7 +2,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.talk.TalkService;
+import talkfeed.gtalk.TalkService;
 
 @CommandType("say")
 public class CommandSay implements Command {

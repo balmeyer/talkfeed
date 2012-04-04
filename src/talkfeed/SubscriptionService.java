@@ -36,7 +36,6 @@ import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
-import talkfeed.talk.TalkService;
 import talkfeed.url.UrlShorten;
 import talkfeed.url.UrlShortenFactory;
 import talkfeed.utils.CacheService;
@@ -56,6 +55,9 @@ public class SubscriptionService {
 
 	private UrlShorten urlShorten;
 
+	
+	
+	
 	/**
 	 * Build notifications to send to users
 	 * 
@@ -210,6 +212,17 @@ public class SubscriptionService {
 		if (urlShorten == null)
 			this.urlShorten = UrlShortenFactory.getInstance();
 		return this.urlShorten;
+	}
+	
+	
+	/**
+	 * Result of notification
+	 * @author vovau
+	 *
+	 */
+	public class NotificationResult{
+		
+		
 	}
 
 }
