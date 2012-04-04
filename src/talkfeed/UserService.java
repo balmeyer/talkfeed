@@ -21,6 +21,7 @@ import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -121,8 +122,6 @@ public class UserService {
 		
 		User user = (User) pm.getObjectById(User.class, id);
 		
-
-		
 		//next update
 		int minuteNextUpdate = user.getInterval() ;
 		if (minuteNextUpdate <10) minuteNextUpdate = 10;
@@ -158,6 +157,7 @@ public class UserService {
 				
 				//compare dates
 				if (blog.getLastUpdate().after(sub.getLastDate())){
+					Logger.getLogger("UserService").info("user " + user.getId() + " present. Try notify : " + blog.getTitle());
 					//TODO notify user
 					Date lastdate = this.notifySubscriptionAndReturnLastDate(pm, sub, jid);
 					if (lastdate == null) lastdate = now;
@@ -182,6 +182,7 @@ public class UserService {
 			
 		} else {
 			minuteNextUpdate = 20;
+			Logger.getLogger("UserService").info("user " + user.getId() + " not present");
 		}
 		
 		//next update
@@ -262,7 +263,8 @@ public class UserService {
 
 			newDate = entryToPush.getPubDate();
 			
-			
+			Logger.getLogger("UserService").info("New entry for " + jabberId.getId() + " : " + link
+					+ "[" + entryToPush.getPubDate() +"]");
 			
 			//save short link
 			if (entryToPush.getShortLink() == null){
@@ -277,6 +279,7 @@ public class UserService {
 		} else {
 			// no new entry : return no date
 			newDate = null; // new Date();
+			Logger.getLogger("UserService").info("no new entry for " + jabberId.getId());
 		}
 
 		return newDate;
