@@ -47,6 +47,7 @@ public class CommandFactory {
 	private static void init(){
 		typeToCommand = new HashMap<String,Command>();
 		
+		
 		for(Class<? extends Command> claz : listClass()){
 			CommandType ctype = claz.getAnnotation(CommandType.class);
 			Command instance = null;

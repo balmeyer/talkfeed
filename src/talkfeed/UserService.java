@@ -74,6 +74,7 @@ public class UserService {
 		// find user
 		Query q = pm.newQuery(User.class);
 		q.setFilter("nextUpdate <= next");
+		q.setFilter("paused == false");
 		q.setOrdering("nextUpdate");
 		q.declareParameters("java.util.Date next");
 		q.setRange(0, nbMax);
@@ -82,7 +83,7 @@ public class UserService {
 		List<User> list = (List<User>) q.execute(now);
 
 		for (User user : list) {
-
+			//build task for queuing
 			QueuedTask task = new QueuedTask();
 			task.setType(TaskType.updateuser);
 			task.addParam("id", user.getKey().getId());
@@ -93,7 +94,6 @@ public class UserService {
 
 		// end of process
 		q.closeAll();
-		pm.flush();
 		pm.close();
 
 	}
