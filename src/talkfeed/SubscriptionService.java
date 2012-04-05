@@ -55,86 +55,9 @@ public class SubscriptionService {
 
 	private UrlShorten urlShorten;
 
-	
-	
-	
-	/**
-	 * Build notifications to send to users
-	 * 
-	 * @param nbMax
-	 */
-	@Deprecated
-	public void sendNotifications(int nbMax) {
-
-		// clear cache datas
-		blogToDate.clear();
-
-		DataManager dm = DataManagerFactory.getInstance();
-		PersistenceManager pm = dm.newPersistenceManager();
-
-		// select subscriptions
-		Query q = pm.newQuery(Subscription.class);
-		q.setOrdering("lastProcessDate");
-		q.setRange(0, nbMax);
-
-		// user that have received update
-		Set<Long> users = new HashSet<Long>();
-
-		@SuppressWarnings("unchecked")
-		List<Subscription> subs = (List<Subscription>) q.execute();
-
-		for (Subscription subscription : subs) {
-			// user has already received an update
-			if (users.contains(subscription.getUserKey().getId()))
-				continue;
-
-			// find blog and compare update time
-			Date blogLastUpdate = blogToDate.get(subscription.getBlogKey()
-					.getId());
-
-			// not found in cache
-			if (blogLastUpdate == null) {
-				try {
-					Blog blog = pm.getObjectById(Blog.class,
-							subscription.getBlogKey());
-					blogLastUpdate = blog.getLastUpdate();
-					blogToDate.put(blog.getKey().getId(), blogLastUpdate);
-				} catch (JDOObjectNotFoundException ex) {
-					// blog deleted ! bad !!
-					pm.currentTransaction().begin();
-					pm.deletePersistent(subscription);
-					pm.currentTransaction().commit();
-					pm.flush();
-					continue;
-				}
-			}
-
-			// compare date between last update blog and subscriptions
-			if (blogLastUpdate.after(subscription.getLastDate())) {
-				// newest entries in blog !
-				// updateBlog + " is newest than " + subscription.getLastDate())
-
-				Queue queue = QueueFactory.getDefaultQueue();
-
-				TaskOptions options = withUrl("/tasks/updatesubscription")
-						.method(Method.GET).param("id",
-								String.valueOf(subscription.getKey().getId()));
-
-				// add to Queue
-				queue.add(options);
-				// add user
-				users.add(subscription.getUserKey().getId());
-
-			}
-
-		}
-
-		q.closeAll();
-		pm.close();
-	}
-
 	/**
 	 * Remove a subscription
+	 * 
 	 * @param id
 	 * @return
 	 */
@@ -156,6 +79,7 @@ public class SubscriptionService {
 
 	/**
 	 * Remove subscription
+	 * 
 	 * @param email
 	 * @param blogId
 	 * @return
@@ -201,7 +125,6 @@ public class SubscriptionService {
 		return true;
 	}
 
-
 	/**
 	 * Get url shorten
 	 * 
@@ -213,16 +136,15 @@ public class SubscriptionService {
 			this.urlShorten = UrlShortenFactory.getInstance();
 		return this.urlShorten;
 	}
-	
-	
+
 	/**
 	 * Result of notification
+	 * 
 	 * @author vovau
-	 *
+	 * 
 	 */
-	public class NotificationResult{
-		
-		
+	public class NotificationResult {
+
 	}
 
 }

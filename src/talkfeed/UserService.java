@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
- 
+
 package talkfeed;
 
 import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
@@ -31,7 +31,6 @@ import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
-import talkfeed.data.UserMark;
 import talkfeed.gtalk.GTalkBlogNotification;
 import talkfeed.gtalk.TalkService;
 import talkfeed.url.UrlShortenFactory;
@@ -45,257 +44,262 @@ import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.google.appengine.api.xmpp.JID;
 import com.google.appengine.api.xmpp.Presence;
 
-
 /**
  * Send subscription via user
+ * 
  * @author vovau
- *
+ * 
  */
 public class UserService {
 
 	private static final String USERMARK_ID = "1";
 	private static final int NB_SUBSCRIPTION_MAX = 20;
-	
-	public void updateUsers(int nbMax){
-		
-		Date now = Calendar.getInstance().getTime();
-		
-		PersistenceManager pm = DataManagerFactory.getInstance().newPersistenceManager();
 
-		//TMP transition
-		//TODO remove when ok
+	private PersistenceManager currentManager;
+
+	public void updateUsers(int nbMax) {
+
+		Date now = Calendar.getInstance().getTime();
+
+		PersistenceManager pm = DataManagerFactory.getInstance()
+				.newPersistenceManager();
+
+		// TMP transition
+		// TODO remove when ok
 		/*
-		 * data correction for version 0.6.1
-		Query qall = pm.newQuery(User.class);
-		List<User> all = (List<User>) qall.execute();
-		for(User us : all){
-			if (us.getNextUpdate() == null) {
-				us.setNextUpdate(now);
-				pm.currentTransaction().begin();
-				pm.flush();
-				pm.currentTransaction().commit();
-			}
-			
-		}*/
-		
-		//find user
+		 * data correction for version 0.6.1 Query qall =
+		 * pm.newQuery(User.class); List<User> all = (List<User>)
+		 * qall.execute(); for(User us : all){ if (us.getNextUpdate() == null) {
+		 * us.setNextUpdate(now); pm.currentTransaction().begin(); pm.flush();
+		 * pm.currentTransaction().commit(); }
+		 * 
+		 * }
+		 */
+
+		// find user
 		Query q = pm.newQuery(User.class);
 		q.setFilter("nextUpdate <= next");
 		q.setOrdering("nextUpdate");
 		q.declareParameters("java.util.Date next");
-		q.setRange(0 , nbMax);
-		
-		//list user
-		List<User> list = (List<User>) q.execute(now);
-		
-		for(User user : list) {
+		q.setRange(0, nbMax);
 
-			//ask for update
+		// list user
+		List<User> list = (List<User>) q.execute(now);
+
+		for (User user : list) {
+
+			// ask for update
 			Queue queue = QueueFactory.getDefaultQueue();
 
-			TaskOptions options = withUrl("/tasks/updateuser")
-					.method(Method.GET).param("id",
-							String.valueOf(user.getKey().getId()));
+			TaskOptions options = withUrl("/tasks/updateuser").method(
+					Method.GET).param("id",
+					String.valueOf(user.getKey().getId()));
 
 			// add to Queue
 			queue.add(options);
-			
+
 		}
 
-		
-		//end of process
+		// end of process
 		q.closeAll();
 		pm.flush();
 		pm.close();
-		
+
 	}
-	
+
 	/**
 	 * Send notification to user, if connected
+	 * 
 	 * @param id
 	 */
-	public void updateUser(long id){
-		//nowaday
+	public void updateUser(long id) {
+		// Nowadays
 		Date now = Calendar.getInstance().getTime();
 
-		//find user
-		PersistenceManager pm = DataManagerFactory.getInstance().newPersistenceManager();
-		
-		User user = (User) pm.getObjectById(User.class, id);
-		
-		//next update
-		int minuteNextUpdate = user.getInterval() ;
-		if (minuteNextUpdate <10) minuteNextUpdate = 10;
+		// create new persistenceManager
+		this.currentManager = DataManagerFactory.getInstance()
+				.newPersistenceManager();
 
-		
+		//fetch user from his jabber id
+		User user = (User) this.currentManager.getObjectById(User.class, id);
+
+		// next update
+		int minuteNextUpdate = user.getInterval();
+		if (minuteNextUpdate < 10)
+			minuteNextUpdate = 10;
+
 		// test user presence
 		JID jid = new JID(user.getId());
 		Presence presence = TalkService.getPresence(jid);
-		
-		if (presence != null && presence.isAvailable()){
-			//update !
-			
+
+		if (presence != null && presence.isAvailable()) {
+			//user is present : do update !
+
 			// select subscriptions
-			Query q = pm.newQuery(Subscription.class);
+			Query q = this.currentManager.newQuery(Subscription.class);
 			q.setOrdering("lastProcessDate");
 			q.setRange(0, NB_SUBSCRIPTION_MAX);
 			q.setFilter("userKey == uk");
 			q.declareParameters("com.google.appengine.api.datastore.Key uk");
 
 			@SuppressWarnings("unchecked")
-			List<Subscription> subs = (List<Subscription>) q.execute(user.getKey());
+			List<Subscription> subs = (List<Subscription>) q.execute(user
+					.getKey());
 
-			//update
-			for(Subscription sub : subs){
-				//fetch blog
-				Blog blog = (Blog) pm.getObjectById(Blog.class, sub.getBlogKey());
-				
-				//last analyze date
+			// update
+			for (Subscription sub : subs) {
+				// update is done ?
+				boolean updateDone = false;
+
+				// fetch blog
+				Blog blog = (Blog) this.currentManager.getObjectById(
+						Blog.class, sub.getBlogKey());
+
+				// compare dates
+				if (blog.getLastUpdate().after(sub.getLastDate())) {
+					Logger.getLogger("UserService").info(
+							"user " + user.getId() + " present. Try notify : "
+									+ blog.getTitle());
+
+					// find next entry
+					BlogEntry nextEntry = this.findNextEntry(sub);
+
+					if (nextEntry == null) {
+						// subscription is up to date
+					} else {
+						// notify user
+						this.sendBlogEntry(jid, nextEntry);
+						// set modification is done
+						updateDone = true;
+						// set current subscription mark to entry date
+						sub.setLastDate(nextEntry.getPubDate());
+
+					}
+
+
+
+				}
+
+				// Update subscription process
+				// last analyze date
 				sub.setLastProcessDate(now);
-				pm.currentTransaction().begin();
-				pm.flush();
-				pm.currentTransaction().commit();
-				
-				//compare dates
-				if (blog.getLastUpdate().after(sub.getLastDate())){
-					Logger.getLogger("UserService").info("user " + user.getId() + " present. Try notify : " + blog.getTitle());
-					//TODO notify user
-					Date lastdate = this.notifySubscriptionAndReturnLastDate(pm, sub, jid);
-					if (lastdate == null) lastdate = now;
-					sub.setLastDate(lastdate);
-					pm.currentTransaction().begin();
-					pm.flush();
-					pm.currentTransaction().commit();
-					
-					//blog
+				this.currentManager.currentTransaction().begin();
+				this.currentManager.flush();
+				this.currentManager.currentTransaction().commit();
+
+				// break
+				if (updateDone) {
+					// update user
 					user.setLastUpdate(now);
 					user.setLastSubscriptionKey(sub.getKey());
-					pm.currentTransaction().begin();
-					pm.flush();
-					pm.currentTransaction().commit();
+					this.currentManager.currentTransaction().begin();
+					this.currentManager.flush();
+					this.currentManager.currentTransaction().commit();
 					break;
-					
 				}
-			
+
 			}
-			
+
 			q.closeAll();
-			
+
 		} else {
 			minuteNextUpdate = 20;
-			Logger.getLogger("UserService").info("user " + user.getId() + " not present");
+			Logger.getLogger("UserService").info(
+					"user " + user.getId() + " not present");
 		}
-		
-		//next update
-		//record next update
+
+		// next update
+		// record next update
 		Calendar nextTime = Calendar.getInstance();
 		nextTime.add(Calendar.MINUTE, minuteNextUpdate);
 		user.setNextUpdate(nextTime.getTime());
-		
-		//flush
-		pm.currentTransaction().begin();
-		pm.flush();
-		pm.currentTransaction().commit();
-		
-		
-		pm.close();
+
+		// flush
+		this.currentManager.currentTransaction().begin();
+		this.currentManager.flush();
+		this.currentManager.currentTransaction().commit();
+
+		this.currentManager.close();
+		this.currentManager = null;
 	}
-	
 
 	/**
-	 * Notify new BlogEntry to user and get new "last blogEntry date"
-	 * return null if no entry is needed
+	 * Find the next entry for current subscription
 	 * 
-	 * @param pm
-	 * @param sub
-	 * @param jabberId
 	 * @return
 	 */
-	private Date notifySubscriptionAndReturnLastDate(PersistenceManager pm,
-			Subscription sub, JID jabberId) {
-
-		//Date now = Calendar.getInstance().getTime();
-		Date newDate = null;
+	private BlogEntry findNextEntry(Subscription sub) {
+		checkArguments(this.currentManager != null,
+				"current PersistenceManager is null");
 
 		// find oldest entry from blog subscription which haven't been sent
-		Query q = pm.newQuery(BlogEntry.class);
+		Query q = this.currentManager.newQuery(BlogEntry.class);
 		q.setFilter("blogKey == blog && pubDate > date");
 		q.setOrdering("pubDate");
 		q.declareParameters("com.google.appengine.api.datastore.Key blog, java.util.Date date");
 		q.setUnique(true);
 		q.setRange(0, 1);
 
-		//find blog entry
+		// find blog entry
 		BlogEntry entryToPush = (BlogEntry) q.execute(sub.getBlogKey(),
 				sub.getLastDate());
 
-		if (entryToPush != null) {
-			// error link : no stanza, try next
-			if (entryToPush.getLink() == null) {
-				if (entryToPush.getPubDate() == null) {
-					return Calendar.getInstance().getTime();
-				} else {
-					return entryToPush.getPubDate();
-				}
-			}
+		q.closeAll();
 
-			//fetch link
-			String link = entryToPush.getShortLink();
-			
-			if (link == null){
-				link = UrlShortenFactory.getInstance().shorten(entryToPush.getLink());
-			} 
-			
-			String blogTitle = entryToPush.getBlogTitle();
-			//TODO remove this when production
-			if (blogTitle == null) blogTitle = getBlogTitle(pm, entryToPush);
-					
-			//build notification
-			GTalkBlogNotification notif = new GTalkBlogNotification();
-			notif.setBlogTitle(blogTitle);
-			notif.setJabberID(jabberId);
-			notif.setPostTitle(entryToPush.getTitle());
-			notif.setPostUrl(link);
-			//send notif
-			TalkService.sendMessage(notif);
-			
+		return entryToPush;
+	}
 
-			// mark last show date
+	/**
+	 * Notify new BlogEntry to user and get new "last blogEntry date" return
+	 * null if no entry is needed
+	 * 
+	 * @param pm
+	 * @param sub
+	 * @param jabberId
+	 * @return
+	 */
+	private void sendBlogEntry(JID jabberId, BlogEntry entry) {
+		checkArguments(entry != null, "Entry must not be null");
 
-			newDate = entryToPush.getPubDate();
-			
-			Logger.getLogger("UserService").info("New entry for " + jabberId.getId() + " : " + link
-					+ "[" + entryToPush.getPubDate() +"]");
-			
-			//save short link
-			if (entryToPush.getShortLink() == null){
-				entryToPush.setShortLink(link);
-				pm.currentTransaction().begin();
-				pm.flush();
-				pm.currentTransaction().commit();
-			}
-			
-			q.closeAll();
+		// fetch link
+		String link = entry.getShortLink();
 
-		} else {
-			// no new entry : return no date
-			newDate = null; // new Date();
-			Logger.getLogger("UserService").info("no new entry for " + jabberId.getId());
+		if (link == null) {
+			link = UrlShortenFactory.getInstance().shorten(entry.getLink());
 		}
 
-		return newDate;
+		String blogTitle = entry.getBlogTitle();
+		// TODO remove this when production
+		if (blogTitle == null)
+			blogTitle = this.getBlogTitle(entry);
+
+		// build notification
+		GTalkBlogNotification notif = new GTalkBlogNotification();
+		notif.setBlogTitle(blogTitle);
+		notif.setJabberID(jabberId);
+		notif.setPostTitle(entry.getTitle());
+		notif.setPostUrl(link);
+		// send notif
+		TalkService.sendMessage(notif);
+
+		Logger.getLogger("UserService").info(
+				"New entry for " + jabberId.getId() + " : " + link + "["
+						+ entry.getPubDate() + "]");
+
 	}
 
 	/**
 	 * To ensure transition
+	 * 
 	 * @param pm
 	 * @param be
 	 * @return
 	 */
-	private String getBlogTitle(PersistenceManager pm, BlogEntry be) {
+	private String getBlogTitle(BlogEntry be) {
+		checkArguments(this.currentManager != null,
+				"current PersistenceManager must not be null");
+		// TODO remove this
 
-		//TODO remove this
-		
 		if (be == null)
 			return null;
 
@@ -305,7 +309,7 @@ public class UserService {
 		Object title = CacheService.get(key);
 
 		if (title == null) {
-			Blog b = pm.getObjectById(Blog.class, k);
+			Blog b = this.currentManager.getObjectById(Blog.class, k);
 			title = b.getTitle();
 			if (title != null)
 				CacheService.put(key, title);
@@ -315,4 +319,16 @@ public class UserService {
 
 		return title.toString();
 	}
+
+	/**
+	 * 
+	 * @param expression
+	 * @param message
+	 */
+	private void checkArguments(boolean expression, String message) {
+		if (!expression) {
+			throw new IllegalArgumentException(message);
+		}
+	}
+
 }
