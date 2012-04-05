@@ -8,7 +8,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 
 	<servlet>
 		<servlet-name>TalkFeed</servlet-name>
-		<servlet-class>talkfeed.TalkFeedServlet</servlet-class>
+		<servlet-class>talkfeed.web.servlet.TalkFeedServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
@@ -19,7 +19,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 	
 	<servlet>
 		<servlet-name>tasks</servlet-name>
-		<servlet-class>talkfeed.TaskServlet</servlet-class>
+		<servlet-class>talkfeed.web.servlet.TaskServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>

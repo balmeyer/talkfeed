@@ -16,8 +16,6 @@
 
 package talkfeed;
 
-import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +23,7 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import talkfeed.QueuedTask.TaskType;
 import talkfeed.blog.Channel;
 import talkfeed.blog.FeedItem;
 import talkfeed.blog.FeedManager;
@@ -35,11 +34,6 @@ import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.utils.DocumentLoader;
 import talkfeed.utils.TextTools;
-
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TaskOptions.Method;
 
 /**
  * Managing web sources update.
@@ -135,16 +129,12 @@ public class BlogService {
 		List<Blog> blogs = (List<Blog>) q.execute(now);
 		
 		for(Blog blog : blogs){
-			//find queue
-			Queue queue = QueueFactory.getDefaultQueue();
+			//add queue
+			QueuedTask task = new QueuedTask();
+			task.setType(TaskType.updateblog);
+			task.addParam("id", blog.getKey().getId());
+			QueuedTask.enqueue(task);
 			
-			
-			TaskOptions options = withUrl("/tasks/updateblog")
-			.method(Method.GET)
-			.param("id", String.valueOf(blog.getKey().getId()));
-			
-			//add to GAE Queue
-			queue.add(options);
 		}
 		
 		

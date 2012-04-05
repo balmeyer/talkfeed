@@ -16,9 +16,6 @@
 
 package talkfeed;
 
-import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
-
-import java.util.Calendar;
 import java.util.Date;
 
 import talkfeed.data.DataManager;
@@ -26,14 +23,10 @@ import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
 import talkfeed.utils.TextTools;
 
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.google.appengine.api.xmpp.Message;
 
 /**
- * Dispatch XMPP message
+ *	Main XMPP message dispatcher
  * @author Balmeyer
  *
  */
@@ -62,7 +55,8 @@ public class Dispatcher {
 		//check is user exists
 		//clean email
 		String jid = TextTools.cleanJID(msg.getFromJid().getId());
-		//System.out.println(jid);
+
+		
 		User user = dm.getUserFromId(jid);
 		if (user == null){
 			user = new User();
@@ -74,36 +68,12 @@ public class Dispatcher {
 		
 		//find instruction
 		Instruction ins = Instruction.build(msg);
-		this.enqueue(ins);
-		
-		//TODO add commands
-		//addSource(user, msg);
+		QueuedTask.enqueue(ins);
+
 	}
 
 
-	/**
-	 * Add instruction to queue
-	 * @param ins
-	 */
-	private void enqueue(Instruction ins){
-		
-		//no instruction
-		if (ins == null) return;
-		
-		//find queue
-		Queue q = QueueFactory.getDefaultQueue();
-		
-		TaskOptions options = withUrl(ins.getUrl()).method(Method.GET);
-		
-		//add params
-		for( String name : ins.getParams().keySet()){
-			String value = ins.getParams().get(name);
-			options = options.param(name, value);
-		}
-		
-		//add to Queue
-		q.add(options);
-	}
+
 	
 	
 }

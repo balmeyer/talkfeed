@@ -38,7 +38,7 @@ public class CommandAddSource implements Command {
 	@Override
 	public void execute(Map<String, String> args) {
 		
-		//retreive user id
+		//Retrieve user id
 		String id = args.get("id");
 		String link = args.get("link");
 		

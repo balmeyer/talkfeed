@@ -16,8 +16,6 @@
 
 package talkfeed;
 
-import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +24,7 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import talkfeed.QueuedTask.TaskType;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManagerFactory;
@@ -37,10 +36,6 @@ import talkfeed.url.UrlShortenFactory;
 import talkfeed.utils.CacheService;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TaskOptions.Method;
 import com.google.appengine.api.xmpp.JID;
 import com.google.appengine.api.xmpp.Presence;
 
@@ -52,11 +47,11 @@ import com.google.appengine.api.xmpp.Presence;
  */
 public class UserService {
 
-	private static final String USERMARK_ID = "1";
-	private static final int NB_SUBSCRIPTION_MAX = 20;
+	private static final int NB_SUBSCRIPTIONS_MAX = 20;
 
 	private PersistenceManager currentManager;
 
+	@SuppressWarnings("unchecked")
 	public void updateUsers(int nbMax) {
 
 		Date now = Calendar.getInstance().getTime();
@@ -88,15 +83,11 @@ public class UserService {
 
 		for (User user : list) {
 
-			// ask for update
-			Queue queue = QueueFactory.getDefaultQueue();
+			QueuedTask task = new QueuedTask();
+			task.setType(TaskType.updateuser);
+			task.addParam("id", user.getKey().getId());
+			QueuedTask.enqueue(task);
 
-			TaskOptions options = withUrl("/tasks/updateuser").method(
-					Method.GET).param("id",
-					String.valueOf(user.getKey().getId()));
-
-			// add to Queue
-			queue.add(options);
 
 		}
 
@@ -138,7 +129,7 @@ public class UserService {
 			// select subscriptions
 			Query q = this.currentManager.newQuery(Subscription.class);
 			q.setOrdering("lastProcessDate");
-			q.setRange(0, NB_SUBSCRIPTION_MAX);
+			q.setRange(0, NB_SUBSCRIPTIONS_MAX);
 			q.setFilter("userKey == uk");
 			q.declareParameters("com.google.appengine.api.datastore.Key uk");
 

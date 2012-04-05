@@ -18,9 +18,7 @@ package talkfeed;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import talkfeed.utils.TextTools;
 
@@ -34,7 +32,7 @@ import com.google.appengine.api.xmpp.Message;
  * @author JBVovau
  *
  */
-public class Instruction{
+public class Instruction extends QueuedTask {
 	
 	//accepted instruct
 	private static final List<String> codesForAccount 
@@ -44,8 +42,7 @@ public class Instruction{
 	private static ArrayList<String> arrayString;
 	
 	private Message message;
-	private Map<String,String> params;
-	private String type;
+	
 	
 	/**
 	 * Build instruction from message
@@ -78,7 +75,7 @@ public class Instruction{
 		if (codesForAccount.contains(mainArg)){
 			//manage account
 			ins.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
-			ins.type = "account";
+			ins.type = TaskType.account;
 			//add
 			if (mainArg.equals("start") || mainArg.equals("on")){
 				ins.addParam("run", "1");
@@ -102,7 +99,7 @@ public class Instruction{
 			
 			//purge all
 			if (mainArg.endsWith("purge")){
-				ins.type = "purge";
+				ins.type = TaskType.purge;
 				return ins;
 			}
 			
@@ -111,7 +108,7 @@ public class Instruction{
 	
 		//instructions about feeds
 		if (codesForManagingBlogs.contains(mainArg)){
-			ins.type = mainArg;
+			ins.type = Enum.valueOf(TaskType.class , mainArg) ;
 			ins.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
 			
 			//add more args
@@ -126,7 +123,7 @@ public class Instruction{
 		//simple add site instruction
 		if (words.length == 1 && mainArg.contains(".")){
 			//add instruction
-			ins.type = "add";
+			ins.type = TaskType.add;
 			ins.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
 			ins.addParam("link", words[0].toLowerCase());
 			return ins;
@@ -134,7 +131,7 @@ public class Instruction{
 		
 		//say
 		if (words.length > 1 && mainArg.equals("say")){
-			ins.type = "say";
+			ins.type = TaskType.say;
 			ins.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
 			ins.addParam("msg", message.getBody());
 			return ins;
@@ -149,8 +146,9 @@ public class Instruction{
 	 * @return
 	 */
 	private Instruction(Message message){
+		super();
 		this.setMessage(message);
-		this.params = new HashMap<String,String>();
+		
 	}
 
 	public void setMessage(Message message) {
@@ -161,18 +159,7 @@ public class Instruction{
 		return message;
 	}
 	
-	public String getUrl(){
-		if( this.type == null) return null;
-		
-		return "/tasks/" + type;
-	}
-	
-	public Map<String,String> getParams(){
-		return this.params;
-	}
 
-	protected void addParam(String key, String value){
-		this.params.put(key,value);
-	}
+
 
 }

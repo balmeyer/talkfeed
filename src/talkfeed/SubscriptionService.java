@@ -16,44 +16,19 @@
 
 package talkfeed;
 
-import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import talkfeed.data.Blog;
-import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
-import talkfeed.url.UrlShorten;
-import talkfeed.url.UrlShortenFactory;
-import talkfeed.utils.CacheService;
-
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.taskqueue.Queue;
-import com.google.appengine.api.taskqueue.QueueFactory;
-import com.google.appengine.api.taskqueue.TaskOptions;
-import com.google.appengine.api.taskqueue.TaskOptions.Method;
-import com.google.appengine.api.xmpp.JID;
-import com.google.appengine.api.xmpp.Presence;
 
 public class SubscriptionService {
 
-	// caching
-	private final Map<Long, Date> blogToDate = new HashMap<Long, Date>();
-
-	private UrlShorten urlShorten;
 
 	/**
 	 * Remove a subscription
@@ -125,26 +100,7 @@ public class SubscriptionService {
 		return true;
 	}
 
-	/**
-	 * Get url shorten
-	 * 
-	 * @return
-	 */
-	@Deprecated
-	private UrlShorten getUrlShorten() {
-		if (urlShorten == null)
-			this.urlShorten = UrlShortenFactory.getInstance();
-		return this.urlShorten;
-	}
 
-	/**
-	 * Result of notification
-	 * 
-	 * @author vovau
-	 * 
-	 */
-	public class NotificationResult {
 
-	}
 
 }

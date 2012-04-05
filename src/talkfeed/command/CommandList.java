@@ -81,11 +81,7 @@ public class CommandList implements Command{
 		
 		//send list
 		TalkService.sendMessage(jid, sb.toString());
-		/*
-		for(String s : list){
-			System.out.println(sb.toString());
-			TalkService.sendMessage(jid, s);
-		}*/
+
 		
 	}
 

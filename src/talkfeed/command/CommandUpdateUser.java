@@ -3,7 +3,6 @@ package talkfeed.command;
 import java.util.Map;
 
 import talkfeed.UserService;
-import talkfeed.gtalk.TalkService;
 
 /**
  * Update every class

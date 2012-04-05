@@ -17,7 +17,6 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.SubscriptionService;
 import talkfeed.UserService;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
@@ -27,7 +26,7 @@ public class CommandNext implements Command {
 
 	@Override
 	public void execute(Map<String, String> args) {
-		// TODO Auto-generated method stub
+
 
 		String jid = args.get("id");
 		

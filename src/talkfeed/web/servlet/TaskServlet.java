@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package talkfeed;
+package talkfeed.web.servlet;
 
 import java.io.IOException;
 import java.util.Enumeration;

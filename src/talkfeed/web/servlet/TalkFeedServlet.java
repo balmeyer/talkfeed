@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-package talkfeed;
+package talkfeed.web.servlet;
 
 import java.io.IOException;
 
@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import talkfeed.Dispatcher;
 import talkfeed.gtalk.TalkService;
 
 
@@ -41,14 +42,10 @@ public class TalkFeedServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		//parse new message
+		//parse new Jabber message
 		Message message = TalkService.parseMessage(req);
 		
 		//dispatch message
-		/*OLD
-		Dispatcher dispatcher = new Dispatcher();
-		dispatcher.dispatch(message);*/
-		
 		Dispatcher.getInstance().dispatch(message);
 		
 
