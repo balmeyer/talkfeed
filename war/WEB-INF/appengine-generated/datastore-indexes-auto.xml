@@ -1,23 +1,17 @@
-<!-- Indices written at Thu, 5 Apr 2012 15:30:54 UTC -->
+<!-- Indices written at Thu, 5 Apr 2012 15:43:17 UTC -->
 
 <datastore-indexes>
 
-    <!-- Used 2 times in query history -->
+    <!-- Used 5 times in query history -->
     <datastore-index kind="Subscription" ancestor="false" source="auto">
         <property name="userKey" direction="asc"/>
         <property name="lastProcessDate" direction="asc"/>
     </datastore-index>
 
-    <!-- Used 1 time in query history -->
+    <!-- Used 7 times in query history -->
     <datastore-index kind="BlogEntry" ancestor="false" source="auto">
         <property name="blogKey" direction="asc"/>
         <property name="pubDate" direction="asc"/>
-    </datastore-index>
-
-    <!-- Used 4 times in query history -->
-    <datastore-index kind="BlogEntry" ancestor="false" source="auto">
-        <property name="blogKey" direction="asc"/>
-        <property name="pubDate" direction="desc"/>
     </datastore-index>
 
 </datastore-indexes>
