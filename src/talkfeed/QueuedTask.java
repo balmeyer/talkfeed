@@ -74,7 +74,7 @@ public class QueuedTask {
 	 * 
 	 * @return
 	 */
-	public String getUrl() {
+	private String getUrl() {
 		if (this.type == null)
 			return null;
 		return START_URL + this.type;
@@ -82,7 +82,7 @@ public class QueuedTask {
 
 	@Override
 	public String toString(){
-		return this.type + "[" + this.getUrl() + "]" + this.params;
+		return this.type + " [" + this.getUrl() + "] " + this.params;
 	}
 	
 	/**

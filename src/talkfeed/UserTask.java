@@ -32,7 +32,7 @@ import com.google.appengine.api.xmpp.Message;
  * @author JBVovau
  *
  */
-public class Instruction extends QueuedTask {
+public class UserTask extends QueuedTask {
 	
 	//accepted instruct
 	private static final List<String> codesForAccount 
@@ -49,8 +49,8 @@ public class Instruction extends QueuedTask {
 	 * @param message
 	 * @return
 	 */
-	public static Instruction build(Message message){
-		Instruction ins = new Instruction(message);
+	public static UserTask build(Message message){
+		UserTask userTask = new UserTask(message);
 		
 		//analyze body message
 		if (message.getBody() == null) return null;
@@ -74,67 +74,67 @@ public class Instruction extends QueuedTask {
 		//test if instruction is account
 		if (codesForAccount.contains(mainArg)){
 			//manage account
-			ins.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
-			ins.type = TaskType.account;
+			userTask.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
+			userTask.type = TaskType.account;
 			//add
 			if (mainArg.equals("start") || mainArg.equals("on")){
-				ins.addParam("run", "1");
+				userTask.addParam("run", "1");
 			}
 			//pause
 			if (mainArg.equals("stop") || mainArg.equals("pause") || mainArg.equals("off")){
-				ins.addParam("run", "0");
+				userTask.addParam("run", "0");
 			}
 			
 			//intervals
 			if (mainArg.equals("every") && words.length >1){
 				//time
-				ins.addParam("time", words[1]);
+				userTask.addParam("time", words[1]);
 				//unit
 				if (words.length >2){
-					ins.addParam("unit", words[2]);
+					userTask.addParam("unit", words[2]);
 				} else {
-					ins.addParam("unit", "minutes");
+					userTask.addParam("unit", "minutes");
 				}
 			}
 			
 			//purge all
 			if (mainArg.endsWith("purge")){
-				ins.type = TaskType.purge;
-				return ins;
+				userTask.type = TaskType.purge;
+				return userTask;
 			}
 			
-			return ins;
+			return userTask;
 		}
 	
 		//instructions about feeds
 		if (codesForManagingBlogs.contains(mainArg)){
-			ins.type = Enum.valueOf(TaskType.class , mainArg) ;
-			ins.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
+			userTask.type = Enum.valueOf(TaskType.class , mainArg) ;
+			userTask.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
 			
 			//add more args
 			int n = 1;
 			for(String w : words){
-				ins.addParam("arg" + (n++) , w);
+				userTask.addParam("arg" + (n++) , w);
 			}
 			
-			return ins;
+			return userTask;
 		}
 	
 		//simple add site instruction
 		if (words.length == 1 && mainArg.contains(".")){
 			//add instruction
-			ins.type = TaskType.add;
-			ins.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
-			ins.addParam("link", words[0].toLowerCase());
-			return ins;
+			userTask.type = TaskType.add;
+			userTask.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
+			userTask.addParam("link", words[0].toLowerCase());
+			return userTask;
 		}
 		
 		//say
 		if (words.length > 1 && mainArg.equals("say")){
-			ins.type = TaskType.say;
-			ins.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
-			ins.addParam("msg", message.getBody());
-			return ins;
+			userTask.type = TaskType.say;
+			userTask.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
+			userTask.addParam("msg", message.getBody());
+			return userTask;
 		}
 		
 		return null;
@@ -145,7 +145,7 @@ public class Instruction extends QueuedTask {
 	 * @param message
 	 * @return
 	 */
-	private Instruction(Message message){
+	private UserTask(Message message){
 		super();
 		this.setMessage(message);
 		

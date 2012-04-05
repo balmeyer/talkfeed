@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import talkfeed.Dispatcher;
+import talkfeed.MessageDispatcher;
 import talkfeed.gtalk.TalkService;
 
 
@@ -46,7 +46,7 @@ public class TalkFeedServlet extends HttpServlet {
 		Message message = TalkService.parseMessage(req);
 		
 		//dispatch message
-		Dispatcher.getInstance().dispatch(message);
+		MessageDispatcher.getInstance().dispatch(message);
 		
 
 	}

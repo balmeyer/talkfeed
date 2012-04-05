@@ -30,19 +30,19 @@ import com.google.appengine.api.xmpp.Message;
  * @author Balmeyer
  *
  */
-public class Dispatcher {
+public class MessageDispatcher {
 
-	private static Dispatcher instance ;
+	private static MessageDispatcher instance ;
 	
-	public static Dispatcher getInstance(){
-		if (instance == null) instance = new Dispatcher();
+	public static MessageDispatcher getInstance(){
+		if (instance == null) instance = new MessageDispatcher();
 		return instance;
 	}
 	
 	/**
 	 * No public constructor
 	 */
-	private Dispatcher(){}
+	private MessageDispatcher(){}
 	
 	/**
 	 * dispatch XMPP message
@@ -67,7 +67,7 @@ public class Dispatcher {
 		}
 		
 		//find instruction
-		Instruction ins = Instruction.build(msg);
+		UserTask ins = UserTask.build(msg);
 		QueuedTask.enqueue(ins);
 
 	}
