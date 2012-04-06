@@ -75,6 +75,13 @@ public class TextTools {
 		return link.trim();
 	}
 
+	public static String limitText(String text, int maxLength) {
+		if (text == null) return null;
+		
+		if (text.length() <= maxLength) return text;
+		
+		return text.substring(0,maxLength - 1);
+	}
 
 	public static String extractRssFromPage(String body) {
 
