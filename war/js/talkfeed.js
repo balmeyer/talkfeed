@@ -45,8 +45,3 @@ function loadPosts(id){
 	
 	
 }
-
-
-function invite(){
-	$j("#invitation").load("/ajax/invite.htm");
-}

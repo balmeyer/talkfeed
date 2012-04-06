@@ -11,15 +11,20 @@ a:HOVER {
 body{
 	margin:0px;
 	padding:0px;
-	margin: 0; /* pour �viter les marges */ 
+	margin: 0; /* pour eviter les marges */ 
 	text-align: center; /* pour corriger le bug de centrage IE */ 
 	font-family: "Calibri","Arial";
 	background-color: #FAFAFA;
+	font-size: 14px;
 }
 
+#header{
+	
+	
+}
 
 #main{
-	text-align: left; /* on r�tablit l'alignement normal du texte */ 
+	text-align: left; /* on retablit l'alignement normal du texte */ 
 	margin-left:auto;
 	margin-right:auto;
 	width:600px;
@@ -45,7 +50,7 @@ body{
 
 .subtitle{
 	font-family: "Calibri","Arial";
-	font-size:20px;
+	font-size:18px;
 	/* border-bottom:1px solid green; */
 	padding: 10px;
 	align:left;
@@ -56,7 +61,7 @@ body{
 
 .block{
 	font-family: "Calibri","Arial";
-	font-size:20px;
+	font-size:16px;
 	border-bottom:1px solid green;
 	padding: 10px;
 	align:left;
@@ -80,6 +85,7 @@ body{
 	border-right:1px dotted #CACACA;
 	padding-left:10px;
 	background: #FAFAFA;
+	font-size:14px;
 }
 
 .post {

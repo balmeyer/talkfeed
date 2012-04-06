@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page isELIgnored="false"%>
 <%@ page contentType="text/html; charset=UTF-8"
-	pageEncoding="ISO-8859-1"%>
+	pageEncoding="UTF-8"%>
 	
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -19,10 +19,21 @@
   	<div id="global">
   		<div id="main">
   		
-  		<div class="block"><a href="/index.htm"><img src="/img/logo.png"/></a> <g:plusone  size="medium"></g:plusone></div>
+  		<div id="header"><a href="/index.htm"><img src="/img/logo.png"/></a> <g:plusone  size="medium"></g:plusone></div>
+  		
   		<div class="subtitle">
-  		<img src="/img/puce.png"/><a href="/help.htm">help</a> 
+  		<img src="/img/puce.png"/><a href="/help.htm">get started</a> 
   		<img src="/img/puce.png"/><a href="/account.htm">account</a> 
-  		<img src="/img/puce.png"/>pouet</div>
+  		  <c:if test="${cookie.username != null}">
+  			<img src="/img/puce.png"/> <a href="/disconnect.htm">sign out</a>
+  		  </c:if>
+  		  
+
+  		  
+  		</div>
+  		
+
+  		
+  		
   		<div id="content"><!-- start content -->
   		
