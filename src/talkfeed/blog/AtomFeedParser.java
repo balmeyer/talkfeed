@@ -26,7 +26,7 @@ import org.w3c.dom.NodeList;
 import talkfeed.utils.TextTools;
 
 /**
- * Transfort document in ATOM format.
+ * Parse document in ATOM format.
  * @author JBVovau
  *
  */
@@ -67,7 +67,7 @@ public class AtomFeedParser implements FeedParser {
     }
 
     /**
-     * Parse les item (entry) du flux Atom
+     * Parse atom items
      * @param node
      * @return
      */

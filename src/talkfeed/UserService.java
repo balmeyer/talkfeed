@@ -164,11 +164,7 @@ public class UserService {
 						updateDone = true;
 						// set current subscription mark to entry date
 						sub.setLastDate(nextEntry.getPubDate());
-
 					}
-
-
-
 				}
 
 				// Update subscription process

@@ -15,13 +15,14 @@
  */
 package talkfeed.blog;
 
-//this is a test
+
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Result of rss feed
+ * Model of a RSS Channel
+ * 
  * @author Jean-Baptiste Vovau
  *
  */

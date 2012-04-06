@@ -18,7 +18,7 @@ package talkfeed.blog;
 import org.w3c.dom.Document;
 
 /**
-* Parse a feed from DOM Document./
+* Parse a feed from DOM Document.
 * @author Jean-Baptiste Vovau
 */
 public interface FeedParser {

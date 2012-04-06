@@ -27,6 +27,11 @@ import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
 
+/**
+ * Managing the user subscription to a website or blog.
+ * @author JBVovau
+ *
+ */
 public class SubscriptionService {
 
 

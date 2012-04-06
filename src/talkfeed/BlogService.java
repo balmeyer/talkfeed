@@ -36,12 +36,13 @@ import talkfeed.utils.DocumentLoader;
 import talkfeed.utils.TextTools;
 
 /**
- * Managing web sources update.
+ * Managing web sources updates.
  * 
  * @author JBVovau
  * 
  */
 public class BlogService {
+
 
 	/**
 	 * Get instance of BlogManager
@@ -56,14 +57,15 @@ public class BlogService {
 	}
 
 	/**
-	 * get or create web source from given link (could be RSS, atom or URL)
+	 * get or create web source from given link (could be RSS, Atom feed or URL)
 	 */
 	public Blog getOrCreateSource(String link) {
-		//arrange or prepare link
+		//prepare link
 		link = TextTools.purgeLink(link);
 		
-		// check blog from link
 		DataManager dm = DataManagerFactory.getInstance();
+		
+		//find if blog already exists in database
 		Blog blog = dm.getBlogFromLink(link);
 
 		if (blog == null) {
@@ -76,14 +78,15 @@ public class BlogService {
 			if (FeedManager.isFeed(content)){
 				rss = link;
 			}else {
-				//extract RSS link from blog content
+				//extract RSS link from page content
 				rss = TextTools.extractRssFromPage(content);
 			}
 
+			//test if rss information hase been found
 			if (rss != null){
-				//check blog again
+				//check again if blog exists with given link
 				blog = dm.getBlogFromLink(rss);
-				
+				//actually create new blog in database
 				if (blog == null){
 					blog = new Blog();
 					blog.setLastUpdate(new Date());
@@ -98,13 +101,6 @@ public class BlogService {
 		return blog;
 	}
 
-	/**
-	 * Purge link
-	 * 
-	 * @param link
-	 * @return
-	 */
-
 
 	/**
 	 * Update feed's blogs.
@@ -113,10 +109,9 @@ public class BlogService {
 		if (nbMax <=0) return;
 		
 		DataManager dm = DataManagerFactory.getInstance();
-		
 		PersistenceManager pm = dm.newPersistenceManager();
 		
-		//find blogs, ordered by "nextUpdate" date
+		//find blogs where "nextUpdate" is before now, ordered by "nextUpdate" date
 		Query q = pm.newQuery(Blog.class);
 		q.setRange(0, nbMax);
 		q.setFilter("nextUpdate <= date");
@@ -129,7 +124,7 @@ public class BlogService {
 		List<Blog> blogs = (List<Blog>) q.execute(now);
 		
 		for(Blog blog : blogs){
-			//add queue
+			//add treatment to queue
 			QueuedTask task = new QueuedTask();
 			task.setType(TaskType.updateblog);
 			task.addParam("id", blog.getKey().getId());
@@ -137,7 +132,7 @@ public class BlogService {
 			
 		}
 		
-		
+		q.closeAll();
 		pm.close();
 	}
 	
@@ -173,7 +168,7 @@ public class BlogService {
 			}
 		} 
 		
-		//set update date
+		//TODO set update date
 		if (hasUpdate) blog.setLastUpdate(new Date());
 		
 		//build nextUpdate
@@ -304,13 +299,23 @@ public class BlogService {
 		BlogEntry mostRecentEntry = null;
 		if (listMostRecentEntry.size() > 0) mostRecentEntry = listMostRecentEntry.get(0);
 		
+		//if most recent entry found, pubDate becomes its date
 		if (mostRecentEntry != null) {
 			recentDate = mostRecentEntry.getPubDate();
 		} else {
+			//if no most recent entry, pubDate is minimum
 			Calendar c = Calendar.getInstance();
 			c.set(Calendar.YEAR,1900);
 			recentDate = c.getTime();
 		}
+		
+		queryMostRecentEntry.closeAll();
+		
+		//query to find blog entry by guid
+		Query queryBlogEntry = pm.newQuery(BlogEntry.class);
+		queryBlogEntry.setFilter("guid == g");
+		queryBlogEntry.declareParameters("java.lang.String g");
+		queryBlogEntry.setUnique(true);
 		
 		//compare item
 		for(FeedItem item : chan.itemsOrderByDate()){
@@ -324,13 +329,7 @@ public class BlogService {
 			
 			//date
 			if(recentDate.after(pubDate)) continue;
-			
-			//find by guid
-			Query queryBlogEntry = pm.newQuery(BlogEntry.class);
-			queryBlogEntry.setFilter("guid == g");
-			queryBlogEntry.declareParameters("java.lang.String g");
-			queryBlogEntry.setUnique(true);
-			
+
 			BlogEntry entry = (BlogEntry) queryBlogEntry.execute(item.getGuid());
 			
 			if (entry == null){
@@ -346,8 +345,11 @@ public class BlogService {
 				pm.makePersistent(entry);
 				newUpdates = true;
 			}
-			
+
+			queryBlogEntry.close(entry);
 		}
+		
+		
 		
 		return newUpdates;
 	}

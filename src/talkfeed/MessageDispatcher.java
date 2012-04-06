@@ -26,7 +26,8 @@ import talkfeed.utils.TextTools;
 import com.google.appengine.api.xmpp.Message;
 
 /**
- *	Main XMPP message dispatcher
+ * Main dispatcher for XMPP messages received by the application from users.
+ * Those XMPP messages are commands typed in GTalk (or Jabber) windows.
  * @author Balmeyer
  *
  */
@@ -52,7 +53,7 @@ public class MessageDispatcher {
 		
 		DataManager dm = DataManagerFactory.getInstance();
 		
-		//check is user exists
+		//check is user exists, if not, create it
 		//clean email
 		String jid = TextTools.cleanJID(msg.getFromJid().getId());
 
@@ -66,9 +67,10 @@ public class MessageDispatcher {
 			dm.save(user);
 		}
 		
-		//find instruction
-		UserTask ins = UserTask.build(msg);
-		QueuedTask.enqueue(ins);
+		//build user task from chat message
+		UserTask userTask = UserTask.build(msg);
+		//add task to queue treatment
+		QueuedTask.enqueue(userTask);
 
 	}
 

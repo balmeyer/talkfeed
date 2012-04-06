@@ -1,3 +1,18 @@
+/*
+ Copyright 2010/2012 - Jean-Baptiste Vovau
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
 package talkfeed;
 
 import static com.google.appengine.api.taskqueue.TaskOptions.Builder.withUrl;
@@ -10,10 +25,16 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.appengine.api.taskqueue.TaskOptions.Method;
 
+/**
+ * Task executed in Google App Engine "queues".
+ * @author JBVovau
+ *
+ */
 public class QueuedTask {
 
 	private final static String START_URL = "/tasks/";
 
+	//parameters of the task (givien in link)
 	private Map<String, String> params;
 	protected TaskType type;
 
@@ -28,18 +49,19 @@ public class QueuedTask {
 		if (ins == null)
 			return;
 
-		// find queue
+		// find default queue
 		Queue q = QueueFactory.getDefaultQueue();
 
+		//build task options
 		TaskOptions options = withUrl(ins.getUrl()).method(Method.GET);
 
-		// add params
+		// add parameters to task
 		for (String name : ins.getParams().keySet()) {
 			String value = ins.getParams().get(name);
 			options = options.param(name, value);
 		}
 
-		// add to Queue
+		//actually add to GAE Queue
 		q.add(options);
 
 	}
@@ -48,10 +70,19 @@ public class QueuedTask {
 		this.params = new HashMap<String, String>();
 	}
 
+	/**
+	 * Parameters of the task, in a key/value map.
+	 * @return
+	 */
 	public Map<String, String> getParams() {
 		return this.params;
 	}
 
+	/**
+	 * Add a parameter to the task
+	 * @param key
+	 * @param value
+	 */
 	public void addParam(String key, Object value) {
 		if (value == null) return;
 		
@@ -59,7 +90,7 @@ public class QueuedTask {
 	}
 
 	/**
-	 * 
+	 * Type of the task
 	 * @return
 	 */
 	public TaskType getType() {
@@ -86,7 +117,7 @@ public class QueuedTask {
 	}
 	
 	/**
-	 * 
+	 * accepted type of the task
 	 * @author vovau
 	 * 
 	 */

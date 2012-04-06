@@ -37,9 +37,13 @@ public class FeedItem {
     	this.channel = channel;
     }
     
+    /**
+     * Unique identifier of the item
+     * @return
+     */
     public String getGuid() {
         
-        //pas de guid
+        //if no guid, unique identifier become link
         if (guid == null){
             return TextTools.md5Encode(this.link);
         }
@@ -51,6 +55,10 @@ public class FeedItem {
         this.guid = guid;
     }
 
+    /**
+     * Post title
+     * @return
+     */
     public String getTitle() {
         return title;
     }
@@ -59,6 +67,10 @@ public class FeedItem {
         this.title = title;
     }
 
+    /**
+     * Description of the RSS item
+     * @return
+     */
     public String getDescription() {
         return description;
     }
@@ -67,6 +79,10 @@ public class FeedItem {
         this.description = description;
     }
 
+    /**
+     * Publication date 
+     * @return
+     */
     public Date getPubDate() {
         return pubDate;
     }
@@ -75,6 +91,10 @@ public class FeedItem {
         this.pubDate = pubDate;
     }
 
+    /**
+     * Link of the post
+     * @return
+     */
     public String getLink() {
         return link;
     }

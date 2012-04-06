@@ -65,7 +65,7 @@ public class RssFeedParser implements FeedParser {
     @Override
 	public Channel parse(Document doc) {
         
-        //création du nouveau channel
+        //create new channel to return
         Channel channel = new Channel();
         
         NodeList list = doc.getElementsByTagName("channel");
@@ -79,7 +79,7 @@ public class RssFeedParser implements FeedParser {
         Node node = list.item(0).getFirstChild();
         
         while (node != null){
-            //System.out.println(node.getNodeName());
+
             //--- TITLE
             if (node.getNodeName().equals("title")){
                 channel.setTitle(node.getTextContent());
@@ -141,6 +141,12 @@ public class RssFeedParser implements FeedParser {
     }
     
 
+    /**
+     * Parse item
+     * @param chan
+     * @param item
+     * @return
+     */
     private FeedItem parseItem(Channel chan, Node item){
         FeedItem feedItem = new FeedItem(chan);
         
@@ -187,7 +193,7 @@ public class RssFeedParser implements FeedParser {
     }
     
     /**
-     * Teste si champs date
+     * Test if field is a valid type.
      * @param value
      * @return
      */
