@@ -1,0 +1,1 @@
+TalkFeed is a RSS feed in Gtalk/Jabber client.
