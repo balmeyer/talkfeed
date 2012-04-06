@@ -30,9 +30,19 @@ import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.api.xmpp.JID;
 
+/**
+ * controller for web application
+ * @author JBVovau
+ *
+ */
 @Controller
 public class AccountController {
 
+	@RequestMapping(value = "/index.htm", method = RequestMethod.GET)
+	public String index(){
+		return "page/home";
+	}
+	
 	/**
 	 * Connect to Google Account
 	 * 
@@ -69,7 +79,7 @@ public class AccountController {
 			throws IOException {
 		UserService userService = UserServiceFactory.getUserService();
 
-		resp.sendRedirect(userService.createLogoutURL("/index.jsp"));
+		resp.sendRedirect(userService.createLogoutURL("/index.htm"));
 
 		return null;
 

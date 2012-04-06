@@ -13,10 +13,16 @@
 <script language="javascript" type="text/javascript"
 	src="/js/talkfeed.js"></script>
 <link rel="stylesheet" type="text/css" href="/css/index.css" />
+<script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 </head>
 <body>
   	<div id="global">
   		<div id="main">
   		
-  		<div class="block"><img src="/img/logo.png"></div>
+  		<div class="subtitle"><a href="/index.htm"><img src="/img/logo.png"/></a> <g:plusone  size="medium"></g:plusone></div>
+  		<div class="block">
+  		<img src="/img/puce.png"/><a href="/help.htm">help</a> 
+  		<img src="/img/puce.png"/><a href="/account.htm">account</a> 
+  		<img src="/img/puce.png"/>pouet</div>
+  		<div id="content"><!-- start content -->
   		

@@ -3,7 +3,6 @@
 
 <div class="block">
 	<a href="/disconnect.htm">disconnect</a>
-
 </div>
 
 
