@@ -19,8 +19,8 @@
   	<div id="global">
   		<div id="main">
   		
-  		<div class="subtitle"><a href="/index.htm"><img src="/img/logo.png"/></a> <g:plusone  size="medium"></g:plusone></div>
-  		<div class="block">
+  		<div class="block"><a href="/index.htm"><img src="/img/logo.png"/></a> <g:plusone  size="medium"></g:plusone></div>
+  		<div class="subtitle">
   		<img src="/img/puce.png"/><a href="/help.htm">help</a> 
   		<img src="/img/puce.png"/><a href="/account.htm">account</a> 
   		<img src="/img/puce.png"/>pouet</div>
