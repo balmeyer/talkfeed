@@ -27,6 +27,7 @@ import javax.jdo.Query;
 import talkfeed.QueuedTask.TaskType;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
+import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
@@ -45,7 +46,7 @@ import com.google.appengine.api.xmpp.Presence;
  * @author vovau
  * 
  */
-public class UserService {
+public class UserManager {
 
 	private static final int NB_SUBSCRIPTIONS_MAX = 20;
 
@@ -147,7 +148,7 @@ public class UserService {
 						Blog.class, sub.getBlogKey());
 
 				// compare dates
-				if (blog.getLastUpdate().after(sub.getLastDate())) {
+				if (blog.getLatestEntryDate().after(sub.getLatestEntryNotifiedDate())) {
 					Logger.getLogger("UserService").info(
 							"user " + user.getId() + " present. Try notify : "
 									+ blog.getTitle());
@@ -163,7 +164,7 @@ public class UserService {
 						// set modification is done
 						updateDone = true;
 						// set current subscription mark to entry date
-						sub.setLastDate(nextEntry.getPubDate());
+						sub.setLatestEntryNotifiedDate(nextEntry.getPubDate());
 					}
 				}
 
@@ -210,6 +211,81 @@ public class UserService {
 		this.currentManager = null;
 	}
 
+
+	/**
+	 * Remove a subscription
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public boolean removeSubscription(long id) {
+
+		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
+
+		Subscription s = pm.getObjectById(Subscription.class, new Long(id));
+		pm.currentTransaction().begin();
+		pm.deletePersistent(s);
+		pm.currentTransaction().commit();
+		pm.flush();
+
+		pm.close();
+
+		return true;
+	}
+	
+
+
+	/**
+	 * Remove subscription
+	 * 
+	 * @param email
+	 * @param blogId
+	 * @return
+	 */
+	public boolean removeSubscription(String email, long blogId) {
+		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
+
+		Query qUser = pm.newQuery(User.class);
+		qUser.setFilter("id == email");
+		qUser.declareParameters("String email");
+		qUser.setRange(0, 1);
+		qUser.setUnique(true);
+
+		User user = (User) qUser.execute(email);
+
+		if (user == null) {
+			qUser.closeAll();
+			return false;
+		}
+
+		Blog blog = pm.getObjectById(Blog.class, new Long(blogId));
+
+		Query q = pm.newQuery(Subscription.class);
+		q.setFilter("userKey == uid && blogKey == bid");
+		q.declareParameters("com.google.appengine.api.datastore.Key uid, com.google.appengine.api.datastore.Key bid");
+		q.setRange(0, 1);
+
+		@SuppressWarnings("unchecked")
+		List<Subscription> list = (List<Subscription>) q.execute(user.getKey(),
+				blog.getKey());
+
+		if (list.size() > 0) {
+			pm.currentTransaction().begin();
+			pm.deletePersistent(list.get(0));
+			pm.currentTransaction().commit();
+			pm.flush();
+
+		}
+		q.closeAll();
+		pm.close();
+
+		return true;
+	}
+
+
+
 	/**
 	 * Find the next entry for current subscription
 	 * 
@@ -229,7 +305,7 @@ public class UserService {
 
 		// find blog entry
 		BlogEntry entryToPush = (BlogEntry) q.execute(sub.getBlogKey(),
-				sub.getLastDate());
+				sub.getLatestEntryNotifiedDate());
 
 		q.closeAll();
 
@@ -307,6 +383,8 @@ public class UserService {
 		return title.toString();
 	}
 
+	
+	
 	/**
 	 * 
 	 * @param expression

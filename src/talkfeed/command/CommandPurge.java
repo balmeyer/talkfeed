@@ -15,6 +15,7 @@
  */
 package talkfeed.command;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ public class CommandPurge implements Command{
 
 		String jid = args.get("id");
 		
+		Date now = Calendar.getInstance().getTime();
+		
 		if (jid != null){
 			DataManager dm = DataManagerFactory.getInstance();
 			PersistenceManager pm = dm.newPersistenceManager();
@@ -65,8 +68,8 @@ public class CommandPurge implements Command{
 				//mark all user's subscription as read (by recent date)
 				for(Subscription s : list){
 					pm.currentTransaction().begin();
-					s.setLastDate(new Date());
-					s.setLastProcessDate(new Date());
+					s.setLatestEntryNotifiedDate(now);
+					s.setLastProcessDate(now);
 					pm.currentTransaction().commit();
 					pm.flush();
 				}

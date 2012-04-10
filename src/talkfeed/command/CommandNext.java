@@ -17,7 +17,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.UserService;
+import talkfeed.UserManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
 
@@ -34,7 +34,7 @@ public class CommandNext implements Command {
 		
 		User user = DataManagerFactory.getInstance().getUserFromId(jid);
 
-		UserService userserv = new UserService();
+		UserManager userserv = new UserManager();
 		userserv.updateUser(user.getKey().getId());
 	}
 

@@ -17,7 +17,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.BlogService;
+import talkfeed.BlogManager;
 
 /**
  * refreshing blog sources : take N oldest web sources, fetch new entries with RSS or Atom Feed and add
@@ -34,7 +34,7 @@ public class CommandRefreshBlogs implements Command {
 	public void execute(Map<String, String> args) {
 
 		//update blogs
-		BlogService.getInstance().updateBlogs(NB_BLOGS);
+		BlogManager.getInstance().updateBlogs(NB_BLOGS);
 	}
 
 }

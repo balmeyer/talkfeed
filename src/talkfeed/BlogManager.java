@@ -41,7 +41,7 @@ import talkfeed.utils.TextTools;
  * @author JBVovau
  * 
  */
-public class BlogService {
+public final class BlogManager {
 
 	private static final int MIN_INTERVAL = 120 ; //2 hours
 	private static final int MAX_INTERVAL = (60 * 24); //1 day
@@ -50,18 +50,25 @@ public class BlogService {
 	 * Get instance of BlogManager
 	 * @return
 	 */
-	public static BlogService getInstance() {
-		return new BlogService();
+	public static BlogManager getInstance() {
+		return new BlogManager();
 	}
 
 	/** No public instance */
-	private BlogService() {
+	private BlogManager() {
 	}
 
 	/**
 	 * get or create web source from given link (could be RSS, Atom feed or URL)
 	 */
 	public Blog getOrCreateSource(String link) {
+		
+		Date now = Calendar.getInstance().getTime();
+		
+		//long time 
+		Calendar calLongTime = Calendar.getInstance();
+		calLongTime.set(Calendar.YEAR, 1900);
+		
 		//prepare link
 		link = TextTools.purgeLink(link);
 		
@@ -91,8 +98,8 @@ public class BlogService {
 				//actually create new blog in database
 				if (blog == null){
 					blog = new Blog();
-					blog.setLastUpdate(new Date());
-					blog.setNextUpdate(new Date());
+					blog.setLatestEntryDate(calLongTime.getTime());
+					blog.setNextUpdate(now);
 					blog.setLink(link);
 					blog.setRss(rss);
 					dm.save(blog);
@@ -151,14 +158,14 @@ public class BlogService {
 		Blog blog = pm.getObjectById(Blog.class,id);
 		
 		//check if blog has any updates
-		boolean hasUpdate = false;
+		BlogUpdateResult result = null;
 		
 		//fetch channel on the web via RSS
 		Channel chan = FeedManager.loadRss(blog.getRss());
 		
 		if (chan != null){
 			//update blog. Returns true if new items were added
-			hasUpdate = updateBlog(pm, blog, chan);
+			result = updateBlog(pm, blog, chan);
 			
 			//test url and title and correct if worng
 			if (chan.getLink() != null && !chan.getLink().equalsIgnoreCase(blog.getLink())){
@@ -171,16 +178,18 @@ public class BlogService {
 		} 
 		
 		//TODO set update date
-		if (hasUpdate) blog.setLastUpdate(new Date());
+		if (result != null && result.isUpdate()) 
+			blog.setLatestEntryDate(result.getLastestEntryDate());
 		
 		//build nextUpdate
 		//if no new update : increase interval
 		int newInterval = blog.getRefreshInterval();
-		if (!hasUpdate){
-			newInterval = newInterval * 2;
-		} else {
+		if (result != null && result.isUpdate()){
 			newInterval = newInterval / 2;
+		} else {
+			newInterval = newInterval * 2;
 		}
+		
 		if (newInterval <= MIN_INTERVAL) newInterval = MIN_INTERVAL; 
 		if (newInterval > MAX_INTERVAL) newInterval = MAX_INTERVAL;
 		
@@ -279,12 +288,11 @@ public class BlogService {
 	 * update entries for a blog with given channel
 	 * @param blog
 	 * @param chan
-	 * @return True if any change has occured (new items found)
+	 * @return True if any change has occurred (new items found)
 	 */
-	private boolean updateBlog(PersistenceManager pm ,Blog blog, Channel chan){
+	private BlogUpdateResult updateBlog(PersistenceManager pm ,Blog blog, Channel chan){
 		
-		
-		boolean newUpdates = false;
+		BlogUpdateResult result = new BlogUpdateResult();
 		
 		Date recentDate = null;
 		
@@ -313,7 +321,7 @@ public class BlogService {
 		
 		queryMostRecentEntry.closeAll();
 		
-		//query to find blog entry by guid
+		//query to find blog entry by GUID
 		Query queryBlogEntry = pm.newQuery(BlogEntry.class);
 		queryBlogEntry.setFilter("guid == g");
 		queryBlogEntry.declareParameters("java.lang.String g");
@@ -345,7 +353,8 @@ public class BlogService {
 				entry.setTitle(TextTools.limitText(item.getTitle(),500));
 				entry.setBlogTitle(TextTools.limitText(chan.getTitle(),500));
 				pm.makePersistent(entry);
-				newUpdates = true;
+				result.setUpdate(true);
+				result.checkEntryDate(pubDate);
 			}
 
 			queryBlogEntry.close(entry);
@@ -353,7 +362,56 @@ public class BlogService {
 		
 		queryBlogEntry.closeAll();
 		
-		return newUpdates;
+		return result;
+	}
+	
+	
+	/**
+	 * Result of a blog update
+	 * @author JBVovau
+	 *
+	 */
+	private class BlogUpdateResult{
+		/**
+		 * are new entries found ?
+		 */
+		private boolean hasUpdate ;
+		/**
+		 * The date of the latest entry
+		 */
+		private Date lastestEntryDate;
+		
+		public boolean isUpdate() {
+			return hasUpdate;
+		}
+		public void setUpdate(boolean hasUpdate) {
+			this.hasUpdate = hasUpdate;
+		}
+		
+		/**
+		 * Returns the latest entry date
+		 * @return
+		 */
+		public Date getLastestEntryDate() {
+			return lastestEntryDate;
+		}
+		
+		/**
+		 * check a new date
+		 * @param lastestEntryDate
+		 */
+		public void checkEntryDate(Date newEntryDate) {
+			
+			if (this.lastestEntryDate == null) this.lastestEntryDate = newEntryDate;
+			else {
+				if (this.lastestEntryDate.before(newEntryDate)) {
+					this.lastestEntryDate = newEntryDate;
+				}
+			}
+			
+			
+		}
+	
 	}
 	
 }

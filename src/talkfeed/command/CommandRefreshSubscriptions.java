@@ -17,7 +17,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.UserService;
+import talkfeed.UserManager;
 
 /**
  * Refresh user subscriptions
@@ -36,7 +36,7 @@ public class CommandRefreshSubscriptions implements Command {
 		SubscriptionService serv = new SubscriptionService();
 		serv.sendNotifications(NB_MAX ); */
 		
-		UserService serv = new UserService();
+		UserManager serv = new UserManager();
 		serv.updateUsers(NB_MAX);
 		
 	}

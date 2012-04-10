@@ -97,7 +97,7 @@ public class Subscription {
 		return priority;
 	}
 
-	public void setLastDate(Date lastDate) {
+	public void setLatestEntryNotifiedDate(Date lastDate) {
 		this.lastDate = lastDate;
 	}
 
@@ -105,7 +105,7 @@ public class Subscription {
 	 * Last read date of user
 	 * @return
 	 */
-	public Date getLastDate() {
+	public Date getLatestEntryNotifiedDate() {
 		return lastDate;
 	}
 
@@ -114,7 +114,8 @@ public class Subscription {
 	}
 
 	/**
-	 * Date of the last entry notified to user
+	 * Date of the last subscription check. User can be not present and notification can be unsent.
+	 * Date shall be put to "now" when the subscription is tested.
 	 * @return
 	 */
 	public Date getLastProcessDate() {

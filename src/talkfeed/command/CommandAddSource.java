@@ -19,7 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import talkfeed.BlogService;
+import talkfeed.BlogManager;
 import talkfeed.data.Blog;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
@@ -42,7 +42,7 @@ public class CommandAddSource implements Command {
 		String id = args.get("id");
 		String link = args.get("link");
 		
-		BlogService blogManager = BlogService.getInstance();
+		BlogManager blogManager = BlogManager.getInstance();
 		DataManager dataManager = DataManagerFactory.getInstance();
 		
 		//get user
@@ -70,12 +70,7 @@ public class CommandAddSource implements Command {
 			sub.setPriority(0);
 			sub.setUserKey(user.getKey());
 			sub.setLastProcessDate(new Date());
-			
-			//add 10 minutes to last date to avoid "global updates"
-			//when new blog is added
-			Calendar newlastDate = Calendar.getInstance();
-			newlastDate.add(Calendar.MINUTE, 10);
-			sub.setLastDate(newlastDate.getTime());
+			sub.setLatestEntryNotifiedDate(new Date());
 			
 			dataManager.save(sub);
 			TalkService.sendMessage(user.getId(),"source added ! :)");

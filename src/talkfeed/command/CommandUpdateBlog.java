@@ -17,7 +17,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.BlogService;
+import talkfeed.BlogManager;
 
 /**
  * Task for updating all entries of a single blog
@@ -35,7 +35,7 @@ public class CommandUpdateBlog implements Command {
 		
 		if(sid != null){
 			long id = Long.parseLong(sid);
-			BlogService bm = BlogService.getInstance();
+			BlogManager bm = BlogManager.getInstance();
 			bm.updateBlog(id);
 		}
 		

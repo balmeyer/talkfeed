@@ -92,15 +92,15 @@ public class Blog {
 		return rss;
 	}
 
-	public void setLastUpdate(Date lastUpdate) {
+	public void setLatestEntryDate(Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 
 	/**
-	 * Last blog update
+	 * Returns pubDate of the more recent entry.
 	 * @return
 	 */
-	public Date getLastUpdate() {
+	public Date getLatestEntryDate() {
 		return lastUpdate;
 	}
 

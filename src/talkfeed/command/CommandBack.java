@@ -75,7 +75,7 @@ public class CommandBack implements Command {
 		
 		for(Subscription s : list){
 			pm.currentTransaction().begin();
-			s.setLastDate(lastPubDate);
+			s.setLatestEntryNotifiedDate(lastPubDate);
 			s.setLastProcessDate(lastProcess);
 			pm.currentTransaction().commit();
 			//TODO do something about lastProcessDate to push

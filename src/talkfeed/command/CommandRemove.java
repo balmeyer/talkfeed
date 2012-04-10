@@ -19,7 +19,7 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
-import talkfeed.SubscriptionService;
+import talkfeed.UserManager;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
@@ -48,7 +48,7 @@ public class CommandRemove implements Command {
 			Key subToRemove = u.getLastSubscriptionKey();
 			
 			if (subToRemove != null){
-				SubscriptionService serv = new SubscriptionService();
+				UserManager serv = new UserManager();
 				serv.removeSubscription(subToRemove.getId());
 				
 				TalkService.sendMessage(jid, "subscription is removed");

@@ -16,9 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
-import talkfeed.SubscriptionService;
+import talkfeed.UserManager;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
@@ -199,7 +198,7 @@ public class AccountController {
 
 		if (user != null) {
 
-			SubscriptionService serv = new SubscriptionService();
+			UserManager serv = new UserManager();
 			serv.removeSubscription(user.getEmail(), id);
 			resp.getWriter().write("OK");
 

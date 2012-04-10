@@ -2,7 +2,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.UserService;
+import talkfeed.UserManager;
 
 /**
  * Update every class
@@ -20,7 +20,7 @@ public class CommandUpdateUser implements Command  {
 
 		if(sid != null){
 			long id = Long.parseLong(sid);
-			UserService us = new UserService();
+			UserManager us = new UserManager();
 			us.updateUser(id);
 		}
 
