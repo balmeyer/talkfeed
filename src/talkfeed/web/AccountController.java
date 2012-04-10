@@ -128,6 +128,7 @@ public class AccountController {
 		}
 
 		resp.addCookie(new Cookie("username", googleUser.getEmail()));
+		
 
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
@@ -147,7 +148,7 @@ public class AccountController {
 		List<Blog> blogs = new ArrayList<Blog>();
 
 		if (talkfeedUser != null) {
-			// lkey from user
+			// key from user
 			Key key = talkfeedUser.getKey();
 
 			// list subscription

@@ -4,7 +4,7 @@
   <cron>
     <url>/tasks/refreshblogs</url>
     <description>Refresh blog feeds</description>
-    <schedule>every 60 minutes</schedule>
+    <schedule>every 30 minutes</schedule>
   </cron>
   
   

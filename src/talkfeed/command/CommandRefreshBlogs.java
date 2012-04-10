@@ -28,11 +28,13 @@ import talkfeed.BlogService;
 @CommandType("refreshblogs")
 public class CommandRefreshBlogs implements Command {
 
+	private static final int NB_BLOGS = 30;
+	
 	@Override
 	public void execute(Map<String, String> args) {
-		//TalkService.sendMessage("balmeyer@gmail.com", "ich ben da !");
-		
-		BlogService.getInstance().updateBlogs(20);
+
+		//update blogs
+		BlogService.getInstance().updateBlogs(NB_BLOGS);
 	}
 
 }

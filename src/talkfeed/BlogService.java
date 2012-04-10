@@ -43,7 +43,9 @@ import talkfeed.utils.TextTools;
  */
 public class BlogService {
 
-
+	private static final int MIN_INTERVAL = 120 ; //2 hours
+	private static final int MAX_INTERVAL = (60 * 24); //1 day
+	
 	/**
 	 * Get instance of BlogManager
 	 * @return
@@ -179,8 +181,8 @@ public class BlogService {
 		} else {
 			newInterval = newInterval / 2;
 		}
-		if (newInterval <= 120) newInterval = 120; //2 hours
-		if (newInterval > (24 * 60 * 3)) newInterval = 24 * 60 * 3; //max : 3 days
+		if (newInterval <= MIN_INTERVAL) newInterval = MIN_INTERVAL; 
+		if (newInterval > MAX_INTERVAL) newInterval = MAX_INTERVAL;
 		
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MINUTE, newInterval);
@@ -318,7 +320,7 @@ public class BlogService {
 		queryBlogEntry.setUnique(true);
 		
 		//compare item
-		for(FeedItem item : chan.itemsOrderByDate()){
+		for(FeedItem item : chan.items()){
 			
 			//parse error
 			if (item.getLink() == null) continue;
@@ -349,7 +351,7 @@ public class BlogService {
 			queryBlogEntry.close(entry);
 		}
 		
-		
+		queryBlogEntry.closeAll();
 		
 		return newUpdates;
 	}

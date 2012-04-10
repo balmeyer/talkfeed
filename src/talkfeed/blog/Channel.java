@@ -40,7 +40,11 @@ public class Channel {
     private String language;
     private String rights;
     
+    //list of items
     private LinkedList<FeedItem> items;
+    
+    //indicate if items are sorted by pubDate
+    //private boolean isSorted = false;
     
     public Channel(){
         this.items = new LinkedList<FeedItem>();
@@ -52,29 +56,28 @@ public class Channel {
     }
     
     /**
-     * Ajout d'un item ou article
+     * Add item or article
      * @param item
      */
     public void insertItemAtFirstPlace(FeedItem item){
-            //this.getItems().add(item);
+         //this.getItems().add(item);
     	this.items.add(0, item);
+    	
+    	//force sort by date
+    	//isSorted = false;
     }
     
+
     /**
-     * Liste des items
+     * Return items ordered by date
      * @return
      */
-    /*
-    public List<FeedItem> getItems(){
-        return this.items;
-    }*/
-
-    public List<FeedItem> itemsOrderByDate(){
+    public List<FeedItem> items(){
     	return this.items;
     }
     
     /**
-     * Titre du flux
+     * Channel title
      * @return
      */
     public String getTitle() {
@@ -82,7 +85,7 @@ public class Channel {
     }
 
     /**
-     * Attribue le titre du flux
+     * 
      * @param title
      */
     public void setTitle(String title) {
@@ -133,7 +136,7 @@ public class Channel {
     }
 
     /**
-     * Date de dernière construction du flux
+     * 
      * @return
      */
     public Date getLastBuildDate() {
@@ -168,15 +171,7 @@ public class Channel {
         this.atom_id = atom_id;
     }
 
-    /*
-    public void setItems(List<FeedItem> items) {
-        this.items = items;
-    }/*
 
-    /**
-     * Obitent l'URL du flux RSS
-     * @return
-     */
     public String getRss() {
         return rss;
     }
@@ -186,7 +181,7 @@ public class Channel {
     }
 
     /**
-     * Langage du glux
+     * feed language
      * @return
      */
     public String getLanguage() {
@@ -198,7 +193,7 @@ public class Channel {
     }
 
     /**
-     * Sous titre
+     * sub title
      * @return
      */
     public String getSubtitle() {
