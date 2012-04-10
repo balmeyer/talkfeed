@@ -14,7 +14,7 @@
 		<div class="blog" id="blog_${blog.key.id}">
 			<a href="javascript:unsubscribe(${blog.key.id});"><img src="/img/close.png" border="0"></a>
 			<a href="javascript:loadPosts(${blog.key.id});" target="out">${blog.label}</a> <a href="${blog.link}" target="out"><img src="/img/new-window.png" border="0"/></a>
-			<div class="lastDate">last update : <fmt:formatDate value="${blog.lastUpdate}" pattern="yyyy-MM-dd"/>
+			<div class="lastDate">last update : <fmt:formatDate value="${blog.latestEntryDate}" pattern="yyyy-MM-dd"/>
 			</div>
 			
 			
