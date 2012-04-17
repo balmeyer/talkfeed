@@ -13,14 +13,15 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package talkfeed.utils;
+package talkfeed.cache;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.cache.Cache;
-import javax.cache.CacheException;
-import javax.cache.CacheManager;
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
 
 import com.google.appengine.api.memcache.stdimpl.GCacheFactory;
 
@@ -30,6 +31,10 @@ import com.google.appengine.api.memcache.stdimpl.GCacheFactory;
  *
  */
 public class CacheService {
+	
+	/** No instance */
+	private CacheService(){}
+	
 	/**
 	 * Returns object in cache
 	 * @param key
@@ -60,16 +65,28 @@ public class CacheService {
 		if (cache != null) cache.remove(key);
 	}
 	
+	/**
+	 * returns current cache
+	 * @return
+	 */
 	private static Cache getCache(){
 		//find in cache first
         Cache cache = null;
+        
+        //configs
         Map<Object,Object> props = new HashMap<Object,Object>();
-        props.put(GCacheFactory.EXPIRATION_DELTA, 3600 * 4); //4 hours
-        try {
-			cache = CacheManager.getInstance().getCacheFactory().createCache(props);
+        props.put(GCacheFactory.EXPIRATION_DELTA, 3600 * 12); //12 hours
+        
+        CacheFactory cacheFactory = null ;
+		try {
+			cacheFactory = CacheManager.getInstance().getCacheFactory();
+			cache = cacheFactory.createCache(props);
 		} catch (CacheException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+
 		
 		return cache;
 	}

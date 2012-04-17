@@ -275,10 +275,6 @@ public final class BlogManager {
 			nb++;
 		}
 		
-		
-
-
-		
 		pm.close();
 		
 		return nb;
@@ -348,7 +344,6 @@ public final class BlogManager {
 				entry.setBlogKey(blog.getKey());
 				entry.setCreaDate(new Date());
 				entry.setPubDate(pubDate);
-				entry.setGuid(item.getGuid());
 				entry.setLink(TextTools.limitText(item.getLink(),500));
 				entry.setTitle(TextTools.limitText(item.getTitle(),500));
 				entry.setBlogTitle(TextTools.limitText(chan.getTitle(),500));

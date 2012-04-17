@@ -15,7 +15,7 @@
  */
 package talkfeed.url;
 
-import talkfeed.utils.CacheService;
+import talkfeed.cache.CacheService;
 
 public abstract class CachedUrlShorten implements UrlShorten {
 

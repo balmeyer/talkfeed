@@ -52,9 +52,6 @@ public class BlogEntry {
 	private String link;
 	
 	@Persistent
-	private String guid;
-	
-	@Persistent
 	private String shortLink;
 	
 	//denormalized to save datastore access
@@ -101,13 +98,6 @@ public class BlogEntry {
 		return link;
 	}
 
-	public void setGuid(String guid) {
-		this.guid = guid;
-	}
-
-	public String getGuid() {
-		return guid;
-	}
 
 	public void setPubDate(Date pubDate) {
 		this.pubDate = pubDate;
