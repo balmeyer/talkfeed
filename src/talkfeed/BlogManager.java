@@ -32,6 +32,7 @@ import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
+import talkfeed.utils.DataUtils;
 import talkfeed.utils.DocumentLoader;
 import talkfeed.utils.TextTools;
 
@@ -58,10 +59,22 @@ public final class BlogManager {
 	private BlogManager() {
 	}
 
+	public Blog getOrCreateSource(String link){
+		DataManager dm = DataManagerFactory.getInstance();
+		
+		PersistenceManager pm = dm.newPersistenceManager();
+		
+		Blog b = this.getOrCreateSource(pm,link);
+		Blog detached = pm.detachCopy(b);
+		pm.close();
+		
+		return detached;
+	}
+	
 	/**
 	 * get or create web source from given link (could be RSS, Atom feed or URL)
 	 */
-	public Blog getOrCreateSource(String link) {
+	public Blog getOrCreateSource(PersistenceManager pm , String link) {
 		
 		Date now = Calendar.getInstance().getTime();
 		
@@ -71,11 +84,10 @@ public final class BlogManager {
 		
 		//prepare link
 		link = TextTools.purgeLink(link);
-		
-		DataManager dm = DataManagerFactory.getInstance();
+
 		
 		//find if blog already exists in database
-		Blog blog = dm.getBlogFromLink(link);
+		Blog blog = DataUtils.getBlogFromLink(pm , link);
 
 		if (blog == null) {
 			//blog does not exist : load content to parse it
@@ -94,7 +106,7 @@ public final class BlogManager {
 			//test if rss information hase been found
 			if (rss != null){
 				//check again if blog exists with given link
-				blog = dm.getBlogFromLink(rss);
+				blog = DataUtils.getBlogFromLink(pm , rss);
 				//actually create new blog in database
 				if (blog == null){
 					blog = new Blog();
@@ -102,7 +114,7 @@ public final class BlogManager {
 					blog.setNextUpdate(now);
 					blog.setLink(link);
 					blog.setRss(rss);
-					dm.save(blog);
+					pm.makePersistent(blog);
 				}
 			}
 		}

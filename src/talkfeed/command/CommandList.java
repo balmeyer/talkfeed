@@ -27,6 +27,7 @@ import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
 import talkfeed.gtalk.TalkService;
+import talkfeed.utils.DataUtils;
 
 import com.google.appengine.api.xmpp.JID;
 
@@ -49,7 +50,7 @@ public class CommandList implements Command{
 		PersistenceManager pm = dm.newPersistenceManager();
 		
 		//fetch user
-		User u = dm.getUserFromId(id);
+		User u = DataUtils.getUserFromId(pm , id);
 		
 		Query q = pm.newQuery(Subscription.class);
 		q.setFilter("userKey == k");
@@ -76,6 +77,7 @@ public class CommandList implements Command{
 			//list.add(sb.toString());
 		}
 		
+		q.closeAll();
 		pm.close();
 
 		

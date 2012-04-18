@@ -53,7 +53,6 @@ public class CacheService {
 	 * @param key
 	 * @param value
 	 */
-	@SuppressWarnings("unchecked")
 	public static void put(Object key, Object value){
 		Cache cache = getCache();
 		

@@ -17,7 +17,11 @@ package talkfeed.command;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import talkfeed.BlogManager;
 import talkfeed.data.Blog;
@@ -26,6 +30,7 @@ import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
 import talkfeed.gtalk.TalkService;
+import talkfeed.utils.DataUtils;
 
 /**
  * Command for adding a web source to user. Check is website exists, and add subscription
@@ -45,11 +50,13 @@ public class CommandAddSource implements Command {
 		BlogManager blogManager = BlogManager.getInstance();
 		DataManager dataManager = DataManagerFactory.getInstance();
 		
-		//get user
-		User user = dataManager.getUserFromId(id);
+		PersistenceManager pm = dataManager.newPersistenceManager();
 		
+		//get user
+		User user = DataUtils.getUserFromId(pm, id);
+	
 		//check if blog exists
-		Blog blog = blogManager.getOrCreateSource(link);
+		Blog blog = blogManager.getOrCreateSource(pm , link);
 		
 		if (blog == null){
 			//blog not found or not avaiable
@@ -58,10 +65,21 @@ public class CommandAddSource implements Command {
 			return;
 		}
 		
-
-		
 		//check subscription
-		Subscription sub = dataManager.getSubscription(user, blog);
+		Subscription sub = null;
+		
+		Query q = pm.newQuery(Subscription.class);
+		q.setFilter("userKey == uk && blogKey == bk");
+		q.declareParameters("com.google.appengine.api.datastore.Key uk , "
+				+ "com.google.appengine.api.datastore.Key bk");
+		
+		
+		@SuppressWarnings("unchecked")
+		List<Subscription> list = (List<Subscription>) q.execute(user.getKey(), blog.getKey());
+		
+		if (list.size() > 0){
+			sub = list.get(0);
+		}
 		
 		//create new subscription
 		if (sub == null){
@@ -72,14 +90,14 @@ public class CommandAddSource implements Command {
 			sub.setLastProcessDate(new Date());
 			sub.setLatestEntryNotifiedDate(new Date());
 			
-			dataManager.save(sub);
+			pm.makePersistent(sub);
 			TalkService.sendMessage(user.getId(),"source added ! :)");
 		} else {
 			TalkService.sendMessage(user.getId(),"already subscribed");
 		}
 		
 		
-		
+		pm.close();
 	}
 
 }

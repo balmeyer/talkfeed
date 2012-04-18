@@ -17,6 +17,10 @@
 package talkfeed;
 
 import java.util.Date;
+import java.util.List;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
@@ -28,54 +32,71 @@ import com.google.appengine.api.xmpp.Message;
 /**
  * Main dispatcher for XMPP messages received by the application from users.
  * Those XMPP messages are commands typed in GTalk (or Jabber) windows.
+ * 
  * @author Balmeyer
- *
+ * 
  */
 public class MessageDispatcher {
 
-	private static MessageDispatcher instance ;
-	
-	public static MessageDispatcher getInstance(){
-		if (instance == null) instance = new MessageDispatcher();
+	private static MessageDispatcher instance;
+
+	public static MessageDispatcher getInstance() {
+		if (instance == null)
+			instance = new MessageDispatcher();
 		return instance;
 	}
-	
+
 	/**
 	 * No public constructor
 	 */
-	private MessageDispatcher(){}
-	
+	private MessageDispatcher() {
+	}
+
 	/**
 	 * dispatch XMPP message
+	 * 
 	 * @param msg
 	 */
-	public void dispatch(Message msg){
-		
-		DataManager dm = DataManagerFactory.getInstance();
-		
-		//check is user exists, if not, create it
-		//clean email
-		String jid = TextTools.cleanJID(msg.getFromJid().getId());
+	public void dispatch(Message msg) {
+		// TODO test
+		DataManager dataManager = DataManagerFactory.getInstance();
+		PersistenceManager pm = dataManager.newPersistenceManager();
 
-		
-		User user = dm.getUserFromId(jid);
-		if (user == null){
-			user = new User();
-			user.setId(jid);
-			user.setDateCrea(new Date());
-			user.setNextUpdate(new Date());
-			dm.save(user);
+		try {
+			// check is user exists, if not, create it
+			// clean email
+			String jid = TextTools.cleanJID(msg.getFromJid().getId());
+
+			User user = null;
+			Query q = pm.newQuery(User.class);
+			q.setFilter("id == jid");
+			q.declareParameters("java.lang.String jid");
+
+			@SuppressWarnings("unchecked")
+			List<User> list = (List<User>) q.execute(jid);
+
+			if (list.size() > 0) {
+				user = list.get(0);
+			}
+
+			if (user == null) {
+				user = new User();
+				user.setId(jid);
+				user.setDateCrea(new Date());
+				user.setNextUpdate(new Date());
+				pm.makePersistent(user);
+			}
+			q.closeAll();
+
+		} finally {
+			pm.close();
 		}
-		
-		//build user task from chat message
+
+		// build user task from chat message
 		UserTask userTask = UserTask.build(msg);
-		//add task to queue treatment
+		// add task to queue treatment
 		QueuedTask.enqueue(userTask);
 
 	}
 
-
-
-	
-	
 }

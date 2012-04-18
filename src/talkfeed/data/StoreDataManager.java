@@ -32,27 +32,9 @@ public class StoreDataManager implements DataManager{
 
 	private static final PersistenceManagerFactory pmFactory = JDOHelper.getPersistenceManagerFactory("datamanager");
 	
-	@Override
-	public User getUserFromId(String id){
-		User user = null;
-		PersistenceManager pm = this.createPersistenceManager();
-		Query q = pm.newQuery(User.class);
-		q.setFilter("id == jid");
-		q.declareParameters("java.lang.String jid");
-		
-		@SuppressWarnings("unchecked")
-		List<User> list = (List<User>) q.execute(id);
-		
-		if (list.size() > 0){
-			user = list.get(0);
-		}
-		
-		pm.close();
-		
-		return user;
-	}
+
 	
-	@Override
+	@Deprecated
 	public Subscription getSubscription(User user, Blog blog){
 		
 		Subscription sub = null;
@@ -76,41 +58,7 @@ public class StoreDataManager implements DataManager{
 		return sub;
 	}
 	
-	/**
-	 * Get a stored Blog from his link (could be direct url or RSS url)
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	public Blog getBlogFromLink(String link){
-		Blog blog = null;
-		PersistenceManager pm = this.createPersistenceManager();
-		
-		//try direct link
-		Query q = pm.newQuery(Blog.class);
-		q.setFilter("link == '" + link +"'");
-		
-		List<Blog> blogs = (List<Blog>) q.execute();
-		
-		if (blogs.size() > 0){
-			blog = blogs.get(0);
-		}
-		
-		//if blog not found, fetch blog by rss
-		if (blog == null){
-			q = pm.newQuery(Blog.class);
-			q.setFilter("rss == '" + link +"'");
-			
-			 blogs = (List<Blog>) q.execute();
-			if (blogs.size() > 0){
-				blog = blogs.get(0);
-			}
-		}
-		
-		pm.close();
-		
-		return blog;
-	}
-	
+
 	@Override
 	public void updateUserActivity(String id, boolean isRunning){
 		PersistenceManager pm = this.createPersistenceManager();
@@ -171,14 +119,6 @@ public class StoreDataManager implements DataManager{
 		return this.createPersistenceManager();
 	}
 	
-	@Override
-	public void save(Object obj){
-		PersistenceManager pm = this.createPersistenceManager();
-		pm.currentTransaction().begin();
-		pm.makePersistent(obj);
-		pm.currentTransaction().commit();
-		pm.close();
-	}
 
 	/**
 	 * Create persistence manager

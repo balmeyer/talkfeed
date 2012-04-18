@@ -20,23 +20,14 @@ import javax.jdo.PersistenceManager;
 
 public interface DataManager {
 
-	/** returns user from given id (email adress / jabber account) */
-	public User getUserFromId(String id);
-	
 	/** return subscription */
 	public Subscription getSubscription(User user, Blog blog);
-	
-	/** get web source from link */
-	public Blog getBlogFromLink(String link);
 
 	/** update account activity */
 	public void updateUserActivity(String id, boolean isRunning);
 	
 	/** update intervals*/
 	public void updateUserInterval(String id, int minutes);
-	
-	/** Save object to current datastore */
-	public void save(Object obj);
 	
 	/** Get persistence manager */
 	public PersistenceManager newPersistenceManager();

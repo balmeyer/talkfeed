@@ -13,6 +13,7 @@ import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
 import talkfeed.gtalk.TalkService;
+import talkfeed.utils.DataUtils;
 
 @CommandType("back")
 public class CommandBack implements Command {
@@ -63,7 +64,7 @@ public class CommandBack implements Command {
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
 		
-		User user = dm.getUserFromId(jid);
+		User user = DataUtils.getUserFromId(pm , jid);
 		
 		Query q = pm.newQuery(Subscription.class);
 		q.setFilter("userKey == uk");
@@ -72,7 +73,7 @@ public class CommandBack implements Command {
 		@SuppressWarnings("unchecked")
 		List<Subscription> list = (List<Subscription>) q.execute(user.getKey());
 		
-		
+		//TODO try to avoid multi transaction
 		for(Subscription s : list){
 			pm.currentTransaction().begin();
 			s.setLatestEntryNotifiedDate(lastPubDate);
@@ -81,6 +82,7 @@ public class CommandBack implements Command {
 			//TODO do something about lastProcessDate to push
 		}
 		
+		q.closeAll();
 		pm.flush();
 		
 		pm.close();

@@ -17,9 +17,12 @@ package talkfeed.command;
 
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+
 import talkfeed.UserManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
+import talkfeed.utils.DataUtils;
 
 @CommandType("next")
 public class CommandNext implements Command {
@@ -32,7 +35,11 @@ public class CommandNext implements Command {
 		
 		if (jid == null) return;
 		
-		User user = DataManagerFactory.getInstance().getUserFromId(jid);
+		PersistenceManager pm = DataManagerFactory.getInstance().newPersistenceManager();
+		User user = DataUtils.getUserFromId(
+				pm, 
+				jid);
+		pm.close();
 
 		UserManager userserv = new UserManager();
 		userserv.updateUser(user.getKey().getId());

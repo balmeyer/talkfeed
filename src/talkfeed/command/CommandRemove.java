@@ -24,6 +24,7 @@ import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
 import talkfeed.gtalk.TalkService;
+import talkfeed.utils.DataUtils;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -43,7 +44,9 @@ public class CommandRemove implements Command {
 			DataManager dm = DataManagerFactory.getInstance();
 			PersistenceManager pm = dm.newPersistenceManager();
 			
-			User u = dm.getUserFromId(jid);
+			User u = DataUtils.getUserFromId(pm , jid);
+			
+			pm.close();
 			
 			Key subToRemove = u.getLastSubscriptionKey();
 			
@@ -54,7 +57,7 @@ public class CommandRemove implements Command {
 				TalkService.sendMessage(jid, "subscription is removed");
 			}
 			
-			pm.close();
+			
 		}
 		
 	}
