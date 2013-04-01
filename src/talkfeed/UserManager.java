@@ -52,6 +52,34 @@ public class UserManager {
 
 	private PersistenceManager currentManager;
 
+	
+	public void setPresence(String id , boolean presence){
+		if (id == null) return;
+		
+		//chargement user
+		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
+
+		Query qUser = pm.newQuery(User.class);
+		qUser.setFilter("id == email");
+		qUser.declareParameters("String email");
+		qUser.setRange(0, 1);
+		qUser.setUnique(true);
+
+		User user = (User) qUser.execute(id);
+
+		if (user == null) {
+			qUser.closeAll();
+			return ;
+		}
+		
+		user.setPresence(presence);
+		pm.currentTransaction().begin();
+		pm.currentTransaction().flush();
+		pm.currentTransaction().commit();
+		
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void updateUsers(int nbMax) {
 

@@ -23,10 +23,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import talkfeed.MessageDispatcher;
+import talkfeed.UserManager;
 import talkfeed.gtalk.TalkService;
 
 
 import com.google.appengine.api.xmpp.Message;
+import com.google.appengine.api.xmpp.Presence;
 
 /**
  * Main TalkFeed Servlet where XMPP Message from Users are parsed.
@@ -42,13 +44,40 @@ public class TalkFeedServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		//parse new Jabber message
-		Message message = TalkService.parseMessage(req);
 		
-		//dispatch message
-		MessageDispatcher.getInstance().dispatch(message);
+		//get type of task
+		String action = req.getPathInfo();
 		
-
+		if(action == null) return;
+		
+		action = action.replace("/","");
+		
+		//MESSAGE
+		if (action.equals("messagechat")) {
+			//parse new Jabber message
+			Message message = TalkService.parseMessage(req);
+			
+			//dispatch message
+			MessageDispatcher.getInstance().dispatch(message);
+			return;
+		}
+		
+		UserManager um = new UserManager();
+		String user = TalkService.getPresenceFrom(req);
+		
+		
+		
+		//PRESENCE
+		if(action.equals("presenceavailable")){
+			
+			um.setPresence(user, true);
+		}
+		
+		//PRESENCE
+		if(action.equals("presenceunavailable")){
+			
+			um.setPresence(user, false);
+		}
 	}
 	
 	

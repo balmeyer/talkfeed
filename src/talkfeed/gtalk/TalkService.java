@@ -88,6 +88,12 @@ public class TalkService {
 		return xmpp.parseMessage(req);
 	}
 	
+	public static final String getPresenceFrom(HttpServletRequest req){
+		String user = null;
+		user = req.getParameter("from");
+		return user;
+	}
+	
 	/**
 	 * Send notification
 	 * @param notif
