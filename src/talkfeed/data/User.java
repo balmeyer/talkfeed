@@ -53,6 +53,9 @@ public class User {
 	@Persistent
 	private Date nextUpdate;
 	
+	@Persistent
+	private boolean presence;
+	
 	public void setKey(Key key) {
 		this.key = key;
 	}
@@ -146,4 +149,15 @@ public class User {
 		this.nextUpdate = nextUpdate;
 	}
 
+	public boolean isPresence() {
+		return presence;
+	}
+
+	public void setPresence(boolean presence) {
+		this.presence = presence;
+	}
+
+	
+
+	
 }

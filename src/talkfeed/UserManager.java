@@ -75,7 +75,7 @@ public class UserManager {
 		
 		user.setPresence(presence);
 		pm.currentTransaction().begin();
-		pm.currentTransaction().flush();
+		pm.flush();
 		pm.currentTransaction().commit();
 		
 	}
