@@ -54,7 +54,7 @@ public class User {
 	private Date nextUpdate;
 	
 	@Persistent
-	private boolean presence;
+	private String presence;
 	
 	public void setKey(Key key) {
 		this.key = key;
@@ -149,11 +149,12 @@ public class User {
 		this.nextUpdate = nextUpdate;
 	}
 
-	public boolean isPresence() {
+	public String getPresence() {
+		if (presence == null) presence = "unavailable";
 		return presence;
 	}
 
-	public void setPresence(boolean presence) {
+	public void setPresence(String presence) {
 		this.presence = presence;
 	}
 

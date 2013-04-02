@@ -17,6 +17,8 @@
 package talkfeed.web.servlet;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import talkfeed.MessageDispatcher;
 import talkfeed.UserManager;
 import talkfeed.gtalk.TalkService;
-
+import talkfeed.utils.TextTools;
 
 import com.google.appengine.api.xmpp.Message;
 import com.google.appengine.api.xmpp.Presence;
@@ -62,19 +64,33 @@ public class TalkFeedServlet extends HttpServlet {
 			return;
 		}
 		
-		UserManager um = new UserManager();
-		String user = TalkService.getPresenceFrom(req);
-		
-		
-		
-		//PRESENCE
-		if(action.equals("presenceavailable")){
+		//ERROR
+		if (action.equals("messageerror")){
 			
+			Logger.getLogger("TalkFeedServlet").log(Level.WARNING, "error chat");
+			return;
+		}
+		
+		//PRESENCE STATUS
+
+		
+		//PRESENCE AVAILABE
+		if(action.equals("presenceavailable")){
+			UserManager um = new UserManager();
+			
+			Presence presence = TalkService.getPresence(req);
+			
+			String user = TextTools.cleanJID(presence.getFromJid().getId());
 			um.setPresence(user, true);
 		}
 		
 		//PRESENCE
 		if(action.equals("presenceunavailable")){
+			UserManager um = new UserManager();
+			
+			Presence presence = TalkService.getPresence(req);
+			
+			String user = TextTools.cleanJID(presence.getFromJid().getId());
 			
 			um.setPresence(user, false);
 		}
