@@ -90,7 +90,9 @@ public class UserManager {
 		User user = (User) qUser.execute(id);
 
 		if (user == null) {
+			//user not found
 			qUser.closeAll();
+			userPresence.remove(id);
 			return ;
 		}
 		
