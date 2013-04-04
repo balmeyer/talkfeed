@@ -18,7 +18,9 @@ package talkfeed;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -35,6 +37,7 @@ import talkfeed.gtalk.GTalkBlogNotification;
 import talkfeed.gtalk.TalkService;
 import talkfeed.url.UrlShortenFactory;
 import talkfeed.utils.CacheService;
+import talkfeed.utils.Logs;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.xmpp.JID;
@@ -52,6 +55,61 @@ public class UserManager {
 
 	private PersistenceManager currentManager;
 
+	//cache user presence
+	private static final Map<String,Boolean> userPresence = new HashMap<String,Boolean>();
+	
+	/**
+	 * Modify user presence in GTalk
+	 * @param id
+	 * @param presence
+	 */
+	public void setPresence(String id , boolean presence){
+		if (id == null) return;
+		
+		Logs.info("Presence for ID : " + id);
+		
+		//look current status in cache
+		if(userPresence.containsKey(id)){
+			//no change : exit
+			if (presence == userPresence.get(id)) return;
+		}
+		
+		//add current status
+		userPresence.put(id, presence);
+		
+		//load user
+		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
+
+		Query qUser = pm.newQuery(User.class);
+		qUser.setFilter("id == email");
+		qUser.declareParameters("String email");
+		qUser.setRange(0, 1);
+		qUser.setUnique(true);
+
+		User user = (User) qUser.execute(id);
+
+		if (user == null) {
+			qUser.closeAll();
+			return ;
+		}
+		
+		Logs.info("User : " + user);
+		
+		String status = "unavailable";
+		if (presence) status = "available";
+		
+		user.setPresence(status);
+		pm.currentTransaction().begin();
+		pm.flush();
+		pm.currentTransaction().commit();
+		
+	}
+	
+	/**
+	 * Send notification for users
+	 * @param nbMax
+	 */
 	@SuppressWarnings("unchecked")
 	public void updateUsers(int nbMax) {
 
@@ -60,22 +118,10 @@ public class UserManager {
 		PersistenceManager pm = DataManagerFactory.getInstance()
 				.newPersistenceManager();
 
-		// TMP transition
-		// TODO remove when ok
-		/*
-		 * data correction for version 0.6.1 Query qall =
-		 * pm.newQuery(User.class); List<User> all = (List<User>)
-		 * qall.execute(); for(User us : all){ if (us.getNextUpdate() == null) {
-		 * us.setNextUpdate(now); pm.currentTransaction().begin(); pm.flush();
-		 * pm.currentTransaction().commit(); }
-		 * 
-		 * }
-		 */
 
 		// find user
 		Query q = pm.newQuery(User.class);
-		q.setFilter("nextUpdate <= next");
-		q.setFilter("paused == false");
+		q.setFilter("nextUpdate <= next && paused == false && presence == 'available'");
 		q.setOrdering("nextUpdate");
 		q.declareParameters("java.util.Date next");
 		q.setRange(0, nbMax);

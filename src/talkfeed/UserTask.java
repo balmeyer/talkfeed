@@ -70,6 +70,14 @@ public class UserTask extends QueuedTask {
 			arrayString.addAll(codesForManagingBlogs);
 		}
 
+		//say
+		if (words.length > 1 && mainArg.equals("say")){
+			userTask.type = TaskType.say;
+			userTask.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
+			userTask.addParam("msg", message.getBody());
+			return userTask;
+		}
+		
 
 		//test if instruction is account
 		if (codesForAccount.contains(mainArg)){
@@ -129,14 +137,7 @@ public class UserTask extends QueuedTask {
 			return userTask;
 		}
 		
-		//say
-		if (words.length > 1 && mainArg.equals("say")){
-			userTask.type = TaskType.say;
-			userTask.addParam("id", TextTools.cleanJID(message.getFromJid().getId()));
-			userTask.addParam("msg", message.getBody());
-			return userTask;
-		}
-		
+
 		return null;
 	}
 	

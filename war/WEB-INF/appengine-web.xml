@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-	<application>talkfeed</application>
-	<version>0-6-6</version>
+
+	<application>talkfeed2</application>
+	<version>0-6-7</version>
 	
 	<!-- Configure java.util.logging -->
 	<system-properties>
@@ -12,7 +13,10 @@
 
   <inbound-services>
     <service>xmpp_message</service>
+    <service>xmpp_presence</service>
   </inbound-services>
+  
+<threadsafe>true</threadsafe>
 
 <static-files>
 	<include path="/favicon.ico" />

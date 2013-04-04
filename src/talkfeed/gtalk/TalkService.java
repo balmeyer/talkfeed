@@ -16,6 +16,7 @@
 package talkfeed.gtalk;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -51,7 +52,11 @@ public class TalkService {
 		
 		XMPPService xmpp = XMPPServiceFactory.getXMPPService();
 		
-		Presence presence = xmpp.getPresence(jid);
+		Presence presence = xmpp.getPresence(jid , new JID("talkfeed@appspot.com"));
+
+		
+		Logger log = Logger.getLogger(TalkService.class.getName());
+		log.info(" send message to : " + jid.getId() + ". Presence : " + presence.isAvailable());
 		
 		if (presence.isAvailable()){
 			
@@ -59,6 +64,7 @@ public class TalkService {
 			Message reply = mb.withRecipientJids(jid)
 				.withMessageType(MessageType.CHAT)
 				.withBody(msg)
+				.withFromJid(new JID("talkfeed@appspot.com"))
 				.build();
 			
 			
@@ -86,6 +92,24 @@ public class TalkService {
 	public static final Message parseMessage(HttpServletRequest req) throws IOException{
 		XMPPService xmpp = XMPPServiceFactory.getXMPPService();
 		return xmpp.parseMessage(req);
+	}
+	
+	/**
+	 * Return a user name
+	 * @param req
+	 * @return
+	 * @throws IOException
+	 */
+	public static final Presence getPresence(HttpServletRequest req) throws IOException{
+
+		XMPPService xmpp = XMPPServiceFactory.getXMPPService();
+		Presence presence = xmpp.parsePresence(req);
+		
+		Logger.getLogger("TalkService").info(
+				" getPresenceFrom : " + presence.getFromJid().getId() );
+		/*
+		user = TextTools.cleanJID(presence.getFromJid().getId());*/
+		return presence;
 	}
 	
 	/**

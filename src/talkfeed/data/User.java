@@ -53,6 +53,9 @@ public class User {
 	@Persistent
 	private Date nextUpdate;
 	
+	@Persistent
+	private String presence;
+	
 	public void setKey(Key key) {
 		this.key = key;
 	}
@@ -146,4 +149,16 @@ public class User {
 		this.nextUpdate = nextUpdate;
 	}
 
+	public String getPresence() {
+		if (presence == null) presence = "unavailable";
+		return presence;
+	}
+
+	public void setPresence(String presence) {
+		this.presence = presence;
+	}
+
+	
+
+	
 }
