@@ -17,7 +17,7 @@
   <cron>
     <url>/tasks/purgeblogs</url>
     <description>Purge unused blogs and oldest entries</description>
-    <schedule>every 24 hours</schedule>
+    <schedule>every 12 hours</schedule>
   </cron>
   
   

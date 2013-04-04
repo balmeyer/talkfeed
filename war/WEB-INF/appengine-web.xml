@@ -9,15 +9,13 @@
 		<property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
 	</system-properties>
 	
-<threadsafe>true</threadsafe>
+  <threadsafe>true</threadsafe>
 
   <inbound-services>
     <service>xmpp_message</service>
     <service>xmpp_presence</service>
   </inbound-services>
   
-<threadsafe>true</threadsafe>
-
 <static-files>
 	<include path="/favicon.ico" />
     	<include path="/robots.txt"/>
