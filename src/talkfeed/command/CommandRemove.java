@@ -49,7 +49,7 @@ public class CommandRemove implements Command {
 			
 			if (subToRemove != null){
 				UserManager serv = new UserManager();
-				serv.removeSubscription(subToRemove.getId());
+				serv.removeUserSubscription(subToRemove.getId());
 				
 				TalkService.sendMessage(jid, "subscription is removed");
 			}

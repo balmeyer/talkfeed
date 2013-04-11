@@ -77,6 +77,8 @@ public class UserManager {
 		//add current status
 		userPresence.put(id, presence);
 		
+		Date now = Calendar.getInstance().getTime();
+		
 		//load user
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
@@ -99,7 +101,10 @@ public class UserManager {
 		Logs.info("User : " + user);
 		
 		String status = "unavailable";
-		if (presence) status = "available";
+		if (presence) {
+			status = "available";
+			user.setLastPresence(now);
+		}
 		
 		user.setPresence(status);
 		pm.currentTransaction().begin();
@@ -148,7 +153,7 @@ public class UserManager {
 	}
 
 	/**
-	 * Send notification to user, if connected
+	 * Send notification to user if presence in gtalk is 'available'
 	 * 
 	 * @param id
 	 */
@@ -195,8 +200,8 @@ public class UserManager {
 				Blog blog = (Blog) this.currentManager.getObjectById(
 						Blog.class, sub.getBlogKey());
 
-				// compare dates
-				if (blog.getLatestEntryDate().after(sub.getLatestEntryNotifiedDate())) {
+				// compare dates bet blog last entry and subscription update
+				if (blog.getLatestEntry().after(sub.getLatestEntryNotifiedDate())) {
 					Logger.getLogger("UserService").info(
 							"user " + user.getId() + " present. Try notify : "
 									+ blog.getTitle());
@@ -239,7 +244,7 @@ public class UserManager {
 			q.closeAll();
 
 		} else {
-			minuteNextUpdate = 20;
+			minuteNextUpdate = 30;
 			Logger.getLogger("UserService").info(
 					"user " + user.getId() + " not present");
 		}
@@ -266,7 +271,7 @@ public class UserManager {
 	 * @param id
 	 * @return
 	 */
-	public boolean removeSubscription(long id) {
+	public boolean removeUserSubscription(long id) {
 
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
@@ -291,7 +296,7 @@ public class UserManager {
 	 * @param blogId
 	 * @return
 	 */
-	public boolean removeSubscription(String email, long blogId) {
+	public boolean removeUserSubscription(String email, long blogId) {
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
 

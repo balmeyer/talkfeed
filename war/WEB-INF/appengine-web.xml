@@ -2,7 +2,7 @@
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
 
 	<application>talkfeed2</application>
-	<version>0-6-8</version>
+	<version>0-6-9</version>
 	
 	<!-- Configure java.util.logging -->
 	<system-properties>

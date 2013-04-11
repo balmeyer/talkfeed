@@ -54,6 +54,9 @@ public class Blog {
 	
 	@Persistent
 	private int refreshInterval;
+	
+	@Persistent
+	private Date lastEntry;
 
 	public void setKey(Key key) {
 		this.key = key;
@@ -92,7 +95,7 @@ public class Blog {
 		return rss;
 	}
 
-	public void setLatestEntryDate(Date lastUpdate) {
+	public void setLatestEntry(Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
 
@@ -100,7 +103,7 @@ public class Blog {
 	 * Returns pubDate of the more recent entry.
 	 * @return
 	 */
-	public Date getLatestEntryDate() {
+	public Date getLatestEntry() {
 		return lastUpdate;
 	}
 

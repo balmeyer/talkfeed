@@ -199,7 +199,7 @@ public class AccountController {
 		if (user != null) {
 
 			UserManager serv = new UserManager();
-			serv.removeSubscription(user.getEmail(), id);
+			serv.removeUserSubscription(user.getEmail(), id);
 			resp.getWriter().write("OK");
 
 		} else {
