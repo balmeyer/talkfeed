@@ -17,6 +17,8 @@ package talkfeed.cache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheException;
@@ -83,6 +85,10 @@ public class CacheService {
 		} catch (CacheException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
+			/* LogManager.getLogManager().getLogger("Cache").log(Level.SEVERE,
+					"erreur de cache",
+					e); */
 		}
 		
 
