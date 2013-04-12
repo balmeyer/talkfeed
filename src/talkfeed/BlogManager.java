@@ -259,7 +259,7 @@ public final class BlogManager {
 		
 		Query q = pm.newQuery(BlogEntry.class);
 		q.setFilter("creaDate < date");
-		q.setRange(0,100);
+		q.setRange(0,50);
 		q.declareParameters("java.util.Date date");
 		
 		Calendar cdat = Calendar.getInstance();
