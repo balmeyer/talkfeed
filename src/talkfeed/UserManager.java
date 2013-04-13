@@ -17,10 +17,9 @@
 package talkfeed;
 
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -46,7 +45,7 @@ import com.google.appengine.api.xmpp.Presence;
 /**
  * Send subscription via user
  * 
- * @author vovau
+ * @author Balmeyer
  * 
  */
 public class UserManager {
@@ -55,9 +54,6 @@ public class UserManager {
 
 	private PersistenceManager currentManager;
 
-	//cache user presence
-	private static final Map<String,Boolean> userPresence = new HashMap<String,Boolean>();
-	
 	/**
 	 * Modify user presence in GTalk
 	 * @param id
@@ -68,49 +64,7 @@ public class UserManager {
 		
 		Logs.info("Presence for ID : " + id);
 		
-		//look current status in cache
-		if(userPresence.containsKey(id)){
-			//no change : exit
-			if (presence == userPresence.get(id)) return;
-		}
-		
-		//add current status
-		userPresence.put(id, presence);
-		
-		Date now = Calendar.getInstance().getTime();
-		
-		//load user
-		DataManager dm = DataManagerFactory.getInstance();
-		PersistenceManager pm = dm.newPersistenceManager();
-
-		Query qUser = pm.newQuery(User.class);
-		qUser.setFilter("id == email");
-		qUser.declareParameters("String email");
-		qUser.setRange(0, 1);
-		qUser.setUnique(true);
-
-		User user = (User) qUser.execute(id);
-
-		if (user == null) {
-			//user not found
-			qUser.closeAll();
-			userPresence.remove(id);
-			return ;
-		}
-		
-		Logs.info("User : " + user);
-		
-		String status = "unavailable";
-		if (presence) {
-			status = "available";
-			user.setLastPresence(now);
-		}
-		
-		user.setPresence(status);
-		pm.currentTransaction().begin();
-		pm.flush();
-		pm.currentTransaction().commit();
-		
+		UserPresence.setPresence(id, presence);
 	}
 	
 	/**
@@ -152,6 +106,21 @@ public class UserManager {
 
 	}
 
+	/**
+	 * Send notif for present users
+	 */
+	public void updatePresentUsers(){
+
+		Collection<String> users = UserPresence.listPresence(10);
+		for(String user : users){
+			//build task for queuing
+			QueuedTask task = new QueuedTask();
+			task.setType(TaskType.updateuser);
+			task.addParam("jid", user);
+			QueuedTask.enqueue(task);
+		}
+	}
+	
 	/**
 	 * Send notification to user if presence in gtalk is 'available'
 	 * 
@@ -264,6 +233,24 @@ public class UserManager {
 		this.currentManager = null;
 	}
 
+	public void updateUser(String email){
+		
+		//TODO if not present ? remove !
+		// test user presence
+		JID jid = new JID(email);
+		Presence presence = TalkService.getPresence(jid);
+
+		if (presence == null || !presence.isAvailable()) {
+			
+		}
+		//TODO update by email
+		
+		
+		
+		
+		//IF UPDATE : set user has received update !
+		UserPresence.setUserUpdated(jid);
+	}
 
 	/**
 	 * Remove a subscription

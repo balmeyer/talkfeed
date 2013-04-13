@@ -45,7 +45,6 @@ public final class BlogManager {
 
 	private static final int MIN_INTERVAL = 120 ; //2 hours
 	private static final int MAX_INTERVAL = (60 * 24); //1 day
-	private static final int NB_ENTRY_PURGE = 200;
 	/**
 	 * Get instance of BlogManager
 	 * @return
