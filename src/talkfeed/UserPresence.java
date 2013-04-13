@@ -96,13 +96,27 @@ public class UserPresence {
 	 * Set user update
 	 * @param jid
 	 */
-	public static void setUserUpdated(String jid){
+	public static void setNextUpdate(String jid, int minutes){
+		
+		if (minutes < 10) minutes = 10;
+		
 		UserData data = getDataFromJID(jid);
 		
 		if (data != null) {
 			Calendar next = Calendar.getInstance();
-			next.add(Calendar.MINUTE, 10);
+			next.add(Calendar.MINUTE, minutes);
 			data.when = next.getTime();
+		}
+	}
+	
+	/**
+	 * Remove user not present
+	 * @param jid
+	 */
+	public static void removeUser(String jid){
+		synchronized (KEY_CACHE_PRESENCE) {
+			UserData toremove = new UserData(jid);
+			users.remove(toremove);
 		}
 	}
 	

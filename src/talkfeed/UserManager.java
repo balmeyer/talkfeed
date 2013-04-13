@@ -235,13 +235,16 @@ public class UserManager {
 
 	public void updateUser(String email){
 		
-		//TODO if not present ? remove !
 		// test user presence
 		JID jid = new JID(email);
 		Presence presence = TalkService.getPresence(jid);
 
+		//has a new subscription ?
+		boolean hasNewSub = false;
+		
 		if (presence == null || !presence.isAvailable()) {
-			
+			UserPresence.removeUser(email);
+			return;
 		}
 		//TODO update by email
 		
@@ -249,7 +252,8 @@ public class UserManager {
 		
 		
 		//IF UPDATE : set user has received update !
-		UserPresence.setUserUpdated(jid);
+		int minutes = (hasNewSub) ? 10 : 20 ;
+		UserPresence.setNextUpdate(email, minutes);
 	}
 
 	/**
