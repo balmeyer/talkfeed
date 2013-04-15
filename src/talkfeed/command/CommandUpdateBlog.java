@@ -16,6 +16,8 @@
 package talkfeed.command;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import talkfeed.BlogManager;
 
@@ -34,9 +36,14 @@ public class CommandUpdateBlog implements Command {
 		String sid = args.get("id");
 		
 		if(sid != null){
+			try {
 			long id = Long.parseLong(sid);
 			BlogManager bm = BlogManager.getInstance();
 			bm.updateBlog(id);
+			} catch (Exception ex){
+				Logger.getLogger("CommandUpdateBlog").log(Level.SEVERE,
+						"Error update " + sid,ex);
+			}
 		}
 		
 	}

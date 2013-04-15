@@ -1,6 +1,8 @@
 package talkfeed.command;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import talkfeed.UserManager;
 
@@ -27,8 +29,13 @@ public class CommandUpdateUser implements Command  {
 		}
 		
 		if(jid != null){
+			try {
 			UserManager us = new UserManager();
 			us.updateUser(jid);
+			} catch (Exception ex){
+				Logger.getLogger("CommandUpdateUser").log(Level.SEVERE,
+						"Error update " + jid,ex);
+			}
 		}
 
 		
