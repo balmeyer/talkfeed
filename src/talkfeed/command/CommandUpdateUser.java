@@ -17,11 +17,18 @@ public class CommandUpdateUser implements Command  {
 		
 		//id
 		String sid = args.get("id");
+		//update by jid (email)
+		String jid = args.get("jid");
 
 		if(sid != null){
 			long id = Long.parseLong(sid);
 			UserManager us = new UserManager();
 			us.updateUser(id);
+		}
+		
+		if(jid != null){
+			UserManager us = new UserManager();
+			us.updateUser(jid);
 		}
 
 		

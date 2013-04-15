@@ -16,6 +16,7 @@
 
 package talkfeed;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -143,6 +144,30 @@ public final class BlogManager {
 		
 		q.closeAll();
 		pm.close();
+	}
+	
+	/**
+	 * Update blog only when user is present
+	 * @param max
+	 */
+	public void updateActiveBlog(int max){
+		//TODO implement this
+		
+		List<Long> blogToUpdate = new ArrayList<Long>();
+		
+		//TODO get active user
+		
+		//TODO get subscriptions
+		
+		//to update
+		for(Long id : blogToUpdate){
+			//add treatment to queue
+			QueuedTask task = new QueuedTask();
+			task.setType(TaskType.updateblog);
+			task.addParam("id", id);
+			QueuedTask.enqueue(task);
+			
+		}
 	}
 	
 	/**
