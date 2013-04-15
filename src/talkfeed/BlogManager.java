@@ -98,7 +98,7 @@ public final class BlogManager {
 				//actually create new blog in database
 				if (blog == null){
 					blog = new Blog();
-					blog.setLatestEntryDate(calLongTime.getTime());
+					blog.setLatestEntry(calLongTime.getTime());
 					blog.setNextUpdate(now);
 					blog.setLink(link);
 					blog.setRss(rss);
@@ -177,9 +177,9 @@ public final class BlogManager {
 			}
 		} 
 		
-		//TODO set update date
+		//Set last post entry date to blog
 		if (result != null && result.isUpdate()) 
-			blog.setLatestEntryDate(result.getLastestEntryDate());
+			blog.setLatestEntry(result.getLastestEntryDate());
 		
 		//build nextUpdate
 		//if no new update : increase interval
@@ -295,32 +295,15 @@ public final class BlogManager {
 		
 		BlogUpdateResult result = new BlogUpdateResult();
 		
-		Date recentDate = null;
-		
-		//find max entry
-		Query queryMostRecentEntry = pm.newQuery(BlogEntry.class);
-		queryMostRecentEntry.setFilter("blogKey == bk");
-		queryMostRecentEntry.declareParameters("com.google.appengine.api.datastore.Key bk");
-		queryMostRecentEntry.setOrdering("pubDate desc");
-		queryMostRecentEntry.setRange(0, 1);
-		
-		//fetch most recent entry by pubDate to test "pubDate"
-		@SuppressWarnings("unchecked")
-		List<BlogEntry> listMostRecentEntry = (List<BlogEntry>) queryMostRecentEntry.execute(blog.getKey());
-		BlogEntry mostRecentEntry = null;
-		if (listMostRecentEntry.size() > 0) mostRecentEntry = listMostRecentEntry.get(0);
-		
+		Date recentDate = blog.getLatestEntry();
+
 		//if most recent entry found, pubDate becomes its date
-		if (mostRecentEntry != null) {
-			recentDate = mostRecentEntry.getPubDate();
-		} else {
+		if (recentDate == null){
 			//if no most recent entry, pubDate is minimum
 			Calendar c = Calendar.getInstance();
 			c.set(Calendar.YEAR,1900);
 			recentDate = c.getTime();
 		}
-		
-		queryMostRecentEntry.closeAll();
 		
 		//query to find blog entry by GUID
 		Query queryBlogEntry = pm.newQuery(BlogEntry.class);
@@ -369,7 +352,7 @@ public final class BlogManager {
 	
 	/**
 	 * Result of a blog update
-	 * @author JBVovau
+	 * @author JB Balmeyer
 	 *
 	 */
 	private class BlogUpdateResult{

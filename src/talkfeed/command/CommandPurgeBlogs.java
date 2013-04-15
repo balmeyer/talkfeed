@@ -33,12 +33,18 @@ public class CommandPurgeBlogs implements Command {
 		
 		//TODO fix this bug : oldest entries removed => push again
 		
+		int nbpurge = 100;
+		
+		if (args.containsKey("nb")){
+			nbpurge = Integer.valueOf(args.get("nb"));
+		}
+		
 		BlogManager bm = BlogManager.getInstance();
 		
 		int nb = bm.removeBlogWithoutSubscription();
 		System.out.println(nb + " blog(s) removed");
 		
-		nb = bm.removeOldestEntries(30);
+		nb = bm.removeOldestEntries(nbpurge);
 		System.out.println(nb + " old entrie(s) removed");
 
 	}

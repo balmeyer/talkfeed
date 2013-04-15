@@ -56,6 +56,9 @@ public class User {
 	@Persistent
 	private String presence;
 	
+	@Persistent
+	private Date lastPresence;
+	
 	public void setKey(Key key) {
 		this.key = key;
 	}
@@ -156,6 +159,14 @@ public class User {
 
 	public void setPresence(String presence) {
 		this.presence = presence;
+	}
+
+	public Date getLastPresence() {
+		return this.lastPresence;
+	}
+
+	public void setLastPresence(Date date) {
+		this.lastPresence = date;
 	}
 
 	
