@@ -14,7 +14,7 @@
    limitations under the License.
  */
 
-package talkfeed;
+package talkfeed.cache;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import talkfeed.utils.CacheService;
 
 /**
  * Save user presence

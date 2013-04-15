@@ -16,8 +16,8 @@
 
 package talkfeed;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +28,9 @@ import talkfeed.QueuedTask.TaskType;
 import talkfeed.blog.Channel;
 import talkfeed.blog.FeedItem;
 import talkfeed.blog.FeedManager;
+import talkfeed.cache.BlogCache;
+import talkfeed.cache.SubscriptionCache;
+import talkfeed.cache.UserPresence;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
@@ -115,6 +118,7 @@ public final class BlogManager {
 	/**
 	 * Update feed's blogs.
 	 */
+	@Deprecated
 	public void updateBlogs(int nbMax){
 		if (nbMax <=0) return;
 		
@@ -150,14 +154,10 @@ public final class BlogManager {
 	 * Update blog only when user is present
 	 * @param max
 	 */
-	public void updateActiveBlog(int max){
-		//TODO implement this
+	public void updateActiveBlogs(int max){
 		
-		List<Long> blogToUpdate = new ArrayList<Long>();
-		
-		//TODO get active user
-		
-		//TODO get subscriptions
+		//fetch list from Cache
+		List<Long> blogToUpdate = BlogCache.getActiveBlogs(max);
 		
 		//to update
 		for(Long id : blogToUpdate){
@@ -226,6 +226,32 @@ public final class BlogManager {
 		
 		pm.flush();
 		pm.close();
+		
+		BlogCache.setBlogIsUpdated(blog.getKey().getId());
+	}
+	
+	/**
+	 * Active blogs regarding users presence.
+	 */
+	public void activeBlogsFromUserPresence(){
+		
+		try {
+			Collection<String> users = UserPresence.listPresence(1000);
+			
+			//for each present user : fetch subscriptions and active blog
+			for(String user : users){
+				//fetch subscriptions
+				Collection<Long> blogs = SubscriptionCache.getUserBlogs(user);
+				for(long id : blogs){
+					BlogCache.setBlogIsActive(id);
+				}
+			}
+			
+		}  finally {
+			//release datastore
+			SubscriptionCache.releaseDataStore();
+		}
+		
 	}
 	
 	/**

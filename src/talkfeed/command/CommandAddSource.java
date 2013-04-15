@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Map;
 
 import talkfeed.BlogManager;
+import talkfeed.cache.SubscriptionCache;
 import talkfeed.data.Blog;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
@@ -73,6 +74,8 @@ public class CommandAddSource implements Command {
 			
 			dataManager.save(sub);
 			TalkService.sendMessage(user.getId(),"source added ! :)");
+			//update cache
+			SubscriptionCache.removeUserFromCache(user.getId());
 		} else {
 			TalkService.sendMessage(user.getId(),"already subscribed");
 		}

@@ -37,8 +37,8 @@ public class CommandRefreshSubscriptions implements Command {
 		serv.sendNotifications(NB_MAX ); */
 		
 		UserManager serv = new UserManager();
-		serv.updateUsers(NB_MAX);
-		
+		//serv.updateUsers(NB_MAX);
+		serv.updatePresentUsers();
 	}
 
 }

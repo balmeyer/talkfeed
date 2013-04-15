@@ -34,7 +34,8 @@ public class CommandRefreshBlogs implements Command {
 	public void execute(Map<String, String> args) {
 
 		//update blogs
-		BlogManager.getInstance().updateBlogs(NB_BLOGS);
+		//BlogManager.getInstance().updateBlogs(NB_BLOGS);
+		BlogManager.getInstance().updateActiveBlogs(NB_BLOGS);
 	}
 
 }

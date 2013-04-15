@@ -26,6 +26,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import talkfeed.QueuedTask.TaskType;
+import talkfeed.cache.CacheService;
+import talkfeed.cache.UserPresence;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
@@ -35,7 +37,6 @@ import talkfeed.data.User;
 import talkfeed.gtalk.GTalkBlogNotification;
 import talkfeed.gtalk.TalkService;
 import talkfeed.url.UrlShortenFactory;
-import talkfeed.utils.CacheService;
 import talkfeed.utils.Logs;
 
 import com.google.appengine.api.datastore.Key;

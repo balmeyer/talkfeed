@@ -20,5 +20,10 @@
     <schedule>every 12 hours</schedule>
   </cron>
   
+  <cron>
+    <url>/tasks/activeblogs</url>
+    <description>Purge unused blogs and oldest entries</description>
+    <schedule>every 5 minutes</schedule>
+  </cron>
   
 </cronentries>
