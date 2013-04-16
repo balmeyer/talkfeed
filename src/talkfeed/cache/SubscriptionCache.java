@@ -28,6 +28,7 @@ import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
+import talkfeed.utils.TextTools;
 
 /**
  * Caching subscriptions
@@ -44,7 +45,7 @@ public class SubscriptionCache {
 	
 	@SuppressWarnings("unchecked")
 	public static Collection<Long> getUserBlogs(String email){
-		
+		email = TextTools.cleanJID(email);
 		//fetch in cache
 		List<Long> blogs = new ArrayList<Long>();
 		String key = KEY_USER_SUB + email;
@@ -73,7 +74,10 @@ public class SubscriptionCache {
 				List<Subscription> subs = (List<Subscription>) q.execute(user
 						.getKey());
 				for(Subscription sub : subs){
-					blogs.add(sub.getBlogKey().getId());
+					long id = sub.getBlogKey().getId();
+					if (!blogs.contains(id)){
+						blogs.add(id);
+					}
 				}
 				q.closeAll();
 				q = null;
@@ -94,6 +98,7 @@ public class SubscriptionCache {
 	 * @param userId
 	 */
 	public static void removeUserFromCache(String user){
+		user = TextTools.cleanJID(user);
 		String key = KEY_USER_SUB + user;
 		CacheService.remove(key);
 	}

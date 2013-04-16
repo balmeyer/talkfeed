@@ -20,6 +20,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -212,13 +214,17 @@ public final class BlogManager {
 		if (result != null && result.isUpdate()) 
 			blog.setLatestEntry(result.getLastestEntryDate());
 		
+		String messageLog = "";
+		
 		//build nextUpdate
 		//if no new update : increase interval
 		int newInterval = blog.getRefreshInterval();
 		if (result != null && result.isUpdate()){
 			newInterval = newInterval / 2;
+			messageLog = "Blog updated [" + blog.getTitle() + "]"; 
 		} else {
 			newInterval = newInterval * 2;
+			messageLog = "No new update [" + blog.getTitle() + "]"; 
 		}
 		
 		if (newInterval <= MIN_INTERVAL) newInterval = MIN_INTERVAL; 
@@ -234,12 +240,17 @@ public final class BlogManager {
 		pm.close();
 		
 		BlogCache.setNextUpdate(blog.getKey().getId(), newInterval);
+		
+		Logger.getLogger("updateBlog").log(Level.INFO,
+				messageLog);
 	}
 	
 	/**
 	 * Active blogs regarding users presence.
 	 */
 	public void activeBlogsFromUserPresence(){
+		
+		int nb = 0;
 		
 		try {
 			Collection<String> users = UserPresence.listPresence(1000);
@@ -250,6 +261,7 @@ public final class BlogManager {
 				Collection<Long> blogs = SubscriptionCache.getUserBlogs(user);
 				for(long id : blogs){
 					BlogCache.setBlogIsActive(id);
+					nb++;
 				}
 			}
 			
@@ -257,6 +269,9 @@ public final class BlogManager {
 			//release datastore
 			SubscriptionCache.releaseDataStore();
 		}
+		
+		Logger.getLogger("UserService").info(
+				nb +  " blog(s) active");
 		
 	}
 	

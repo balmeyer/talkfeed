@@ -22,6 +22,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import talkfeed.utils.TextTools;
 
 
 /**
@@ -46,6 +50,8 @@ public class UserPresence {
 	public static void setPresence(String jid, boolean presence){
 
 		refreshListWithCache();
+		
+		jid = TextTools.cleanJID(jid);
 		
 		UserData data = new UserData(jid);
 		
@@ -77,9 +83,11 @@ public class UserPresence {
 		
 		Date now = Calendar.getInstance().getTime();
 		
+		int nb = 0;
+		
 		Collection<String> copy = new ArrayList<String>();
 		synchronized (KEY_CACHE_PRESENCE) {
-			int nb = 0;
+			
 			for(UserData data : users){
 				if (nb++ >= max) break;
 				
@@ -87,6 +95,9 @@ public class UserPresence {
 				copy.add(data.jid);
 			}
 		}
+		
+		Logger.getLogger("UserPresence").log(Level.INFO,
+				"Active users : " + nb + ", to update : " + copy.size());
 		
 		return copy;
 	}
@@ -96,6 +107,8 @@ public class UserPresence {
 	 * @param jid
 	 */
 	public static void setNextUpdate(String jid, int minutes){
+		
+		jid = TextTools.cleanJID(jid);
 		
 		if (minutes < 10) minutes = 10;
 		

@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Cache managing for blog updates.
@@ -78,12 +80,15 @@ public class BlogCache {
 			for (BlogData data : blogs) {
 				if (nb++ > max)
 					break;
-				if (now.after(data.next)) {
+				if (now.after(data.next) && !list.contains(data.id)) {
 					list.add(data.id);
 				}
 			}
 		}
 
+		Logger.getLogger("BlogCache").log(Level.INFO,
+				"total blogs : " + nb + ", active : "+list.size());
+		
 		return list;
 	}
 

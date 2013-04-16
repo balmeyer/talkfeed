@@ -38,6 +38,7 @@ import talkfeed.gtalk.GTalkBlogNotification;
 import talkfeed.gtalk.TalkService;
 import talkfeed.url.UrlShortenFactory;
 import talkfeed.utils.Logs;
+import talkfeed.utils.TextTools;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.xmpp.JID;
@@ -128,6 +129,9 @@ public class UserManager {
 	 * @param id
 	 */
 	public void updateUser(long id, String email) {
+		
+		email = TextTools.cleanJID(email);
+		
 		// Nowadays
 		Date now = Calendar.getInstance().getTime();
 
@@ -228,9 +232,13 @@ public class UserManager {
 					this.currentManager.flush();
 					this.currentManager.currentTransaction().commit();
 					break;
+				}else {
+					//nothing to update
+					Logger.getLogger("UserService").info(
+							"user " + user.getId() + " present but nothing to update.");
 				}
 
-			}
+			} 
 
 			q.closeAll();
 
@@ -262,6 +270,8 @@ public class UserManager {
 	 * @param email
 	 */
 	public void updateUser(String email){
+		
+		email = TextTools.cleanJID(email);
 		
 		// test user presence
 		JID jid = new JID(email);
@@ -314,7 +324,10 @@ public class UserManager {
 	 * @param blogId
 	 * @return
 	 */
-	public boolean removeUserSubscription(String email, long blogId) {
+	public boolean removeUserSubscription(String email, final long blogId) {
+		
+		email = TextTools.cleanJID(email);
+		
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
 
