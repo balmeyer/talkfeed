@@ -49,7 +49,7 @@ public class CommandList implements Command{
 		PersistenceManager pm = dm.newPersistenceManager();
 		
 		//fetch user
-		User u = dm.getUserFromId(id);
+		User u = dm.getUserFromId(pm , id);
 		
 		Query q = pm.newQuery(Subscription.class);
 		q.setFilter("userKey == k");
@@ -77,7 +77,7 @@ public class CommandList implements Command{
 		}
 		
 		pm.close();
-
+		pm = null;
 		
 		//send list
 		TalkService.sendMessage(jid, sb.toString());

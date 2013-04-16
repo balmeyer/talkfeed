@@ -42,6 +42,7 @@ public class SubscriptionCache {
 	
 	private SubscriptionCache(){}
 	
+	@SuppressWarnings("unchecked")
 	public static Collection<Long> getUserBlogs(String email){
 		
 		//fetch in cache
@@ -93,7 +94,8 @@ public class SubscriptionCache {
 	 * @param userId
 	 */
 	public static void removeUserFromCache(String user){
-		
+		String key = KEY_USER_SUB + user;
+		CacheService.remove(key);
 	}
 	
 	/**

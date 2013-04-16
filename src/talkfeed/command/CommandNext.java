@@ -17,7 +17,10 @@ package talkfeed.command;
 
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+
 import talkfeed.UserManager;
+import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
 
@@ -32,10 +35,8 @@ public class CommandNext implements Command {
 		
 		if (jid == null) return;
 		
-		User user = DataManagerFactory.getInstance().getUserFromId(jid);
-
 		UserManager userserv = new UserManager();
-		userserv.updateUser(user.getKey().getId());
+		userserv.updateUser(0,jid);
 	}
 
 }

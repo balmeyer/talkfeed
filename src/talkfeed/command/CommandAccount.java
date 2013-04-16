@@ -17,8 +17,11 @@ package talkfeed.command;
 
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
+import talkfeed.data.User;
 import talkfeed.gtalk.TalkService;
 
 /**
@@ -40,12 +43,20 @@ public class CommandAccount implements Command {
 		if (id == null) return;
 		
 		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
+		
+		User user = null;
+		
+		//bad action
+		if (run == null || time == null) return;
+		
+		user = dm.getUserFromId(pm, id);
 		
 		//manage updates
 		if (run != null){
 			boolean isPaused = run.equals("0");
 			
-			dm.updateUserActivity(id, !isPaused);
+			user.setPaused(isPaused);
 			
 			String reply = null;
 			if (isPaused){
@@ -54,7 +65,6 @@ public class CommandAccount implements Command {
 				reply = "welcome back !";
 			}
 			TalkService.sendMessage(id, reply);
-			return;
 		}
 		
 		//interval between updates
@@ -65,9 +75,16 @@ public class CommandAccount implements Command {
 				minutes = minutes * 60;
 			}
 			
-			dm.updateUserInterval(id, minutes);
+			user.setInterval(minutes);
 			TalkService.sendMessage(id, "blog update every " + minutes + " minute(s)");
 		}
+		
+		pm.currentTransaction().begin();
+		pm.flush();
+		pm.currentTransaction().commit();
+		
+		pm.close();
+		pm = null;
 	}
 
 }

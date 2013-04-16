@@ -87,9 +87,15 @@ public class BlogCache {
 		return list;
 	}
 
-	public static void setBlogIsUpdated(long id) {
+	public static void setNextUpdate(final long id, int nextMinutes) {
+		//refresh from cache
 		refresh();
 
+		if (nextMinutes < 60) {
+			nextMinutes = 60;
+		}
+		
+		//find blog data in cache et put next time
 		BlogData data = new BlogData(id);
 
 		synchronized (KEY_CACHE_BLOGS) {
@@ -98,7 +104,7 @@ public class BlogCache {
 			}
 
 			Calendar next = Calendar.getInstance();
-			next.add(Calendar.MINUTE, 60);
+			next.add(Calendar.MINUTE, nextMinutes);
 			data.next = next.getTime();
 			blogs.add(data);
 

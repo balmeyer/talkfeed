@@ -108,7 +108,7 @@ public class UserManager {
 	}
 
 	/**
-	 * Send notif for present users
+	 * Send notification for present users
 	 */
 	public void updatePresentUsers(){
 
@@ -127,7 +127,7 @@ public class UserManager {
 	 * 
 	 * @param id
 	 */
-	public void updateUser(long id) {
+	public void updateUser(long id, String email) {
 		// Nowadays
 		Date now = Calendar.getInstance().getTime();
 
@@ -136,8 +136,29 @@ public class UserManager {
 				.newPersistenceManager();
 
 		//fetch user from his jabber id
-		User user = (User) this.currentManager.getObjectById(User.class, id);
+		User user = null;
+		if (id >0) {
+			//fetch by id
+			user = (User) this.currentManager.getObjectById(User.class, id);
+		} else {
+			//find by email
+			if(email != null){
+				
+				Query qUser = this.currentManager.newQuery(User.class);
+				qUser.setFilter("id == email");
+				qUser.declareParameters("String email");
+				qUser.setRange(0, 1);
+				qUser.setUnique(true);
 
+				user = (User) qUser.execute(email);
+			} 
+		}
+
+		//user error
+		if (user == null){
+			throw new IllegalArgumentException("NO user found : id=" + id + ", email=" +email);
+		}
+		
 		// next update
 		int minuteNextUpdate = user.getInterval();
 		if (minuteNextUpdate < 10)
@@ -215,6 +236,8 @@ public class UserManager {
 
 		} else {
 			minuteNextUpdate = 30;
+			//remove from presence
+			UserPresence.setPresence(user.getId(), false);
 			Logger.getLogger("UserService").info(
 					"user " + user.getId() + " not present");
 		}
@@ -234,6 +257,10 @@ public class UserManager {
 		this.currentManager = null;
 	}
 
+	/**
+	 * Update when user id is unkwnown
+	 * @param email
+	 */
 	public void updateUser(String email){
 		
 		// test user presence
@@ -247,10 +274,9 @@ public class UserManager {
 			UserPresence.removeUser(email);
 			return;
 		}
-		//TODO update by email
 		
-		
-		
+		this.updateUser(0, email);
+
 		
 		//IF UPDATE : set user has received update !
 		int minutes = (hasNewSub) ? 10 : 20 ;

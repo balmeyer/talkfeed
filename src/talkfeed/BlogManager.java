@@ -48,7 +48,7 @@ import talkfeed.utils.TextTools;
 public final class BlogManager {
 
 	private static final int MIN_INTERVAL = 120 ; //2 hours
-	private static final int MAX_INTERVAL = (60 * 24); //1 day
+	private static final int MAX_INTERVAL = (60 * 24 * 2); //2 days
 	
 	/**
 	 * Get instance of BlogManager
@@ -77,9 +77,10 @@ public final class BlogManager {
 		link = TextTools.purgeLink(link);
 		
 		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
 		
 		//find if blog already exists in database
-		Blog blog = dm.getBlogFromLink(link);
+		Blog blog = dm.getBlogFromLink(pm , link);
 
 		if (blog == null) {
 			//blog does not exist : load content to parse it
@@ -98,7 +99,7 @@ public final class BlogManager {
 			//test if rss information hase been found
 			if (rss != null){
 				//check again if blog exists with given link
-				blog = dm.getBlogFromLink(rss);
+				blog = dm.getBlogFromLink(pm , rss);
 				//actually create new blog in database
 				if (blog == null){
 					blog = new Blog();
@@ -106,10 +107,15 @@ public final class BlogManager {
 					blog.setNextUpdate(now);
 					blog.setLink(link);
 					blog.setRss(rss);
-					dm.save(blog);
+					pm.currentTransaction().begin();
+					pm.makePersistent(blog);
+					pm.currentTransaction().commit();
 				}
 			}
 		}
+		
+		pm.close();
+		pm = null;
 
 		return blog;
 	}
@@ -227,7 +233,7 @@ public final class BlogManager {
 		pm.flush();
 		pm.close();
 		
-		BlogCache.setBlogIsUpdated(blog.getKey().getId());
+		BlogCache.setNextUpdate(blog.getKey().getId(), newInterval);
 	}
 	
 	/**
@@ -326,11 +332,7 @@ public final class BlogManager {
 			pm.currentTransaction().commit();
 			nb++;
 		}
-		
-		
 
-
-		
 		pm.close();
 		
 		return nb;
@@ -443,8 +445,6 @@ public final class BlogManager {
 					this.lastestEntryDate = newEntryDate;
 				}
 			}
-			
-			
 		}
 	
 	}

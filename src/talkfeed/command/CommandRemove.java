@@ -44,7 +44,7 @@ public class CommandRemove implements Command {
 			DataManager dm = DataManagerFactory.getInstance();
 			PersistenceManager pm = dm.newPersistenceManager();
 			
-			User u = dm.getUserFromId(jid);
+			User u = dm.getUserFromId(pm,jid);
 			
 			Key subToRemove = u.getLastSubscriptionKey();
 			

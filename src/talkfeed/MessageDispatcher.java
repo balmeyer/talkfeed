@@ -18,6 +18,8 @@ package talkfeed;
 
 import java.util.Date;
 
+import javax.jdo.PersistenceManager;
+
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
@@ -52,20 +54,26 @@ public class MessageDispatcher {
 	public void dispatch(Message msg){
 		
 		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
 		
 		//check is user exists, if not, create it
 		//clean email
 		String jid = TextTools.cleanJID(msg.getFromJid().getId());
 
 		
-		User user = dm.getUserFromId(jid);
+		User user = dm.getUserFromId(pm , jid);
 		if (user == null){
 			user = new User();
 			user.setId(jid);
 			user.setDateCrea(new Date());
 			user.setNextUpdate(new Date());
-			dm.save(user);
+			pm.currentTransaction().begin();
+			pm.makePersistent(user);
+			pm.currentTransaction().commit();
 		}
+		
+		pm.close();
+		pm = null;
 		
 		//build user task from chat message
 		UserTask userTask = UserTask.build(msg);

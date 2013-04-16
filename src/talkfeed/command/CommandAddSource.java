@@ -18,6 +18,8 @@ package talkfeed.command;
 import java.util.Date;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+
 import talkfeed.BlogManager;
 import talkfeed.cache.SubscriptionCache;
 import talkfeed.data.Blog;
@@ -44,24 +46,22 @@ public class CommandAddSource implements Command {
 		
 		BlogManager blogManager = BlogManager.getInstance();
 		DataManager dataManager = DataManagerFactory.getInstance();
+		PersistenceManager pm = dataManager.newPersistenceManager();
 		
 		//get user
-		User user = dataManager.getUserFromId(id);
+		User user = dataManager.getUserFromId(pm , id);
 		
 		//check if blog exists
 		Blog blog = blogManager.getOrCreateSource(link);
 		
 		if (blog == null){
 			//blog not found or not avaiable
-			//TODO send user error message
 			TalkService.sendMessage(user.getId(),"blog not found ! :(");
 			return;
 		}
 		
-
-		
 		//check subscription
-		Subscription sub = dataManager.getSubscription(user, blog);
+		Subscription sub = dataManager.getSubscription(pm , user, blog);
 		
 		//create new subscription
 		if (sub == null){
@@ -72,7 +72,10 @@ public class CommandAddSource implements Command {
 			sub.setLastProcessDate(new Date());
 			sub.setLatestEntryNotifiedDate(new Date());
 			
-			dataManager.save(sub);
+			pm.currentTransaction().begin();
+			pm.makePersistent(sub);
+			pm.currentTransaction().commit();
+
 			TalkService.sendMessage(user.getId(),"source added ! :)");
 			//update cache
 			SubscriptionCache.removeUserFromCache(user.getId());
@@ -80,7 +83,8 @@ public class CommandAddSource implements Command {
 			TalkService.sendMessage(user.getId(),"already subscribed");
 		}
 		
-		
+		pm.close();
+		pm = null;
 		
 	}
 

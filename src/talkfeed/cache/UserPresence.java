@@ -119,6 +119,7 @@ public class UserPresence {
 		}
 	}
 	
+
 	private static UserData getDataFromJID(String jid){
 		if(jid == null) return null;
 		
@@ -157,10 +158,16 @@ public class UserPresence {
 			this.when = Calendar.getInstance().getTime();
 		}
 		
+		@Override
 		public boolean equals(Object obj){
 			if (obj == null) return false;
 			UserData other = (UserData) obj;
 			return this.jid.equals(other.jid);
+		}
+		
+		@Override
+		public String toString(){
+			return this.jid + "[when:" + this.when + "]";
 		}
 	}
 	
