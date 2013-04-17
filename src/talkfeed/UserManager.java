@@ -113,7 +113,7 @@ public class UserManager {
 	 */
 	public void updatePresentUsers(){
 
-		Collection<String> users = UserPresence.listPresence(10);
+		Collection<String> users = UserPresence.listUserByNextUpdate(14);
 		for(String user : users){
 			//build task for queuing
 			QueuedTask task = new QueuedTask();
@@ -255,6 +255,7 @@ public class UserManager {
 		Calendar nextTime = Calendar.getInstance();
 		nextTime.add(Calendar.MINUTE, minuteNextUpdate);
 		user.setNextUpdate(nextTime.getTime());
+		UserPresence.setNextUpdate(user.getId(), minuteNextUpdate);
 
 		// flush
 		this.currentManager.currentTransaction().begin();

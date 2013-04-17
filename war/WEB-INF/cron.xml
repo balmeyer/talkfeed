@@ -4,14 +4,14 @@
   <cron>
     <url>/tasks/refreshblogs</url>
     <description>Refresh blog feeds</description>
-    <schedule>every 30 minutes</schedule>
+    <schedule>every 20 minutes</schedule>
   </cron>
   
   
   <cron>
     <url>/tasks/refreshsubscriptions</url>
     <description>Refresh subscriptions</description>
-    <schedule>every 10 minutes</schedule>
+    <schedule>every 8 minutes</schedule>
   </cron>
   
   <cron>

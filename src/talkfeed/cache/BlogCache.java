@@ -131,7 +131,7 @@ public class BlogCache {
 
 			// purge inactive blog
 			Calendar old = Calendar.getInstance();
-			old.add(Calendar.HOUR, 24);
+			old.add(Calendar.HOUR, 24 * 4);
 			boolean isupdate = false;
 			int i = 0;
 			while (i < blogs.size()) {

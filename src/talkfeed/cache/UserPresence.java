@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -73,26 +74,45 @@ public class UserPresence {
 		}
 	}
 	
+	public static Collection<String> listUserByNextUpdate(int max) {
+		return listUsers(max, true);
+	}
+	
+	public static Collection<String> listUsers() {
+		return listUsers(10000, false);
+	}
+	
 	/**
 	 * List user presence
 	 * @return
 	 */
-	public static Collection<String> listPresence(int max){
+	private static Collection<String> listUsers(int max , boolean orderByNextUpdate){
 		
 		refreshListWithCache();
 		
-		Date now = Calendar.getInstance().getTime();
-		
 		int nb = 0;
+		
+		Date now = Calendar.getInstance().getTime();
 		
 		Collection<String> copy = new ArrayList<String>();
 		synchronized (KEY_CACHE_PRESENCE) {
+			//sort collection by user next update
+			Collections.sort(users);
 			
 			for(UserData data : users){
-				if (nb++ >= max) break;
+				//all users
+				if (!orderByNextUpdate){
+					copy.add(data.jid);
+					continue;
+				} else {
+					if (data.nextUpdate == null || now.after(data.nextUpdate)){
+						copy.add(data.jid);
+					}
+					
+				}
 				
-				if (now.after(data.when))
-				copy.add(data.jid);
+				if (nb++ >= max) break;
+			
 			}
 		}
 		
@@ -117,7 +137,7 @@ public class UserPresence {
 		if (data != null) {
 			Calendar next = Calendar.getInstance();
 			next.add(Calendar.MINUTE, minutes);
-			data.when = next.getTime();
+			data.nextUpdate = next.getTime();
 		}
 	}
 	
@@ -158,17 +178,19 @@ public class UserPresence {
 		}
 	}
 	
-	private static class UserData implements Serializable{
+	private static class UserData implements Serializable,Comparable{
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1L;
 		public String jid;
-		public Date when;
+		public Date presenceDate ;
+		public Date nextUpdate;
 		
 		public UserData(String jid){
 			this.jid = jid;
-			this.when = Calendar.getInstance().getTime();
+			this.presenceDate = Calendar.getInstance().getTime();
+			this.nextUpdate = this.presenceDate;
 		}
 		
 		@Override
@@ -180,7 +202,16 @@ public class UserPresence {
 		
 		@Override
 		public String toString(){
-			return this.jid + "[when:" + this.when + "]";
+			return this.jid + "[when:" + this.presenceDate + "]";
+		}
+
+		@Override
+		public int compareTo(Object obj) {
+			if (obj == null) return 0;
+			UserData other = (UserData) obj;
+			if (this.nextUpdate == null) return -1;
+			if (other.nextUpdate == null) return 1;
+			return this.nextUpdate.compareTo(other.nextUpdate);
 		}
 	}
 	

@@ -253,7 +253,7 @@ public final class BlogManager {
 		int nb = 0;
 		
 		try {
-			Collection<String> users = UserPresence.listPresence(1000);
+			Collection<String> users = UserPresence.listUsers();
 			
 			//for each present user : fetch subscriptions and active blog
 			for(String user : users){
