@@ -165,7 +165,7 @@ public final class BlogManager {
 	public void updateActiveBlogs(int max){
 		
 		//fetch list from Cache
-		List<Long> blogToUpdate = BlogCache.getActiveBlogs(max);
+		List<Long> blogToUpdate = BlogCache.getActiveBlogsToUpdate(max);
 		
 		//to update
 		for(Long id : blogToUpdate){

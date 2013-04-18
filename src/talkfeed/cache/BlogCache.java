@@ -69,7 +69,7 @@ public class BlogCache {
 		}
 	}
 
-	public static List<Long> getActiveBlogs(int max) {
+	public static List<Long> getActiveBlogsToUpdate(int max) {
 		refresh();
 
 		List<Long> list = new ArrayList<Long>();
@@ -87,11 +87,33 @@ public class BlogCache {
 		}
 
 		Logger.getLogger("BlogCache").log(Level.INFO,
-				"total blogs : " + nb + ", active : "+list.size());
+				"total blogs : " + nb + ", to update : "+list.size());
 		
 		return list;
 	}
 
+	public static List<Long> getAllActiveBlogs() {
+		refresh();
+
+		List<Long> list = new ArrayList<Long>();
+
+		synchronized (KEY_CACHE_BLOGS) {
+			for (BlogData data : blogs) {
+				list.add(data.id);
+			}
+		}
+
+		Logger.getLogger("BlogCache").log(Level.INFO,
+				"total blogs : " +list.size());
+		
+		return list;
+	}
+
+	
+	public static int countActiveBlogs(){
+		refresh();
+		return blogs.size();
+	}
 	public static void setNextUpdate(final long id, int nextMinutes) {
 		//refresh from cache
 		refresh();
