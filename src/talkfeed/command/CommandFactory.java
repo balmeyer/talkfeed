@@ -86,7 +86,8 @@ public class CommandFactory {
 			CommandNext.class,
 			CommandBack.class,
 			CommandUpdateUser.class,
-			CommandActiveBlogs.class
+			CommandActiveBlogs.class,
+			CommandMail.class
 		};
 	}
 }

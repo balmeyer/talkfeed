@@ -59,6 +59,9 @@ public class User {
 	@Persistent
 	private Date lastPresence;
 	
+	@Persistent
+	private Date lastEmail;
+	
 	public void setKey(Key key) {
 		this.key = key;
 	}
@@ -167,6 +170,14 @@ public class User {
 
 	public void setLastPresence(Date date) {
 		this.lastPresence = date;
+	}
+
+	public Date getLastEmail() {
+		return this.lastEmail;
+	}
+
+	public void setLastEmail(Date date) {
+		this.lastEmail = date;
 	}
 
 	
