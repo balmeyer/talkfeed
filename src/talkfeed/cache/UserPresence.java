@@ -178,7 +178,7 @@ public class UserPresence {
 		}
 	}
 	
-	private static class UserData implements Serializable,Comparable{
+	private static class UserData implements Serializable,Comparable<UserData>{
 		/**
 		 * 
 		 */
@@ -206,9 +206,8 @@ public class UserPresence {
 		}
 
 		@Override
-		public int compareTo(Object obj) {
-			if (obj == null) return 0;
-			UserData other = (UserData) obj;
+		public int compareTo(UserData other) {
+			if (other == null) return 0;
 			if (this.nextUpdate == null) return -1;
 			if (other.nextUpdate == null) return 1;
 			return this.nextUpdate.compareTo(other.nextUpdate);

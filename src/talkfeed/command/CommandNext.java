@@ -17,12 +17,7 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import javax.jdo.PersistenceManager;
-
 import talkfeed.UserManager;
-import talkfeed.data.DataManager;
-import talkfeed.data.DataManagerFactory;
-import talkfeed.data.User;
 
 @CommandType("next")
 public class CommandNext implements Command {

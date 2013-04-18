@@ -49,8 +49,8 @@ import talkfeed.utils.TextTools;
  */
 public final class BlogManager {
 
-	private static final int MIN_INTERVAL = 120 ; //2 hours
-	private static final int MAX_INTERVAL = (60 * 24 * 2); //2 days
+	private static final int MIN_INTERVAL = 60 ; //1 hour
+	private static final int MAX_INTERVAL = (60 * 4); //4 days
 	
 	/**
 	 * Get instance of BlogManager
