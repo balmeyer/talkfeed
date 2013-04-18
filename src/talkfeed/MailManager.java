@@ -40,10 +40,6 @@ public class MailManager {
 	 * @param id
 	 */
 	public void mailUser(long id){
-		System.out.println(id);
-	}
-	
-	private void mailFromDate(long id , Date last){
 		
 		//data
 		DataManager dm = DataManagerFactory.getInstance();
@@ -62,11 +58,13 @@ public class MailManager {
 		
 		boolean ismail = false;
 		
+		StringBuilder email = new StringBuilder();
+		
 		//retrieve subscriptions
 		//fetch sub
 		Query sq = pm.newQuery(Subscription.class);
 		sq.setFilter("userKey == uk && lastDate > date");
-		sq.declareParameters("com.google.appengine.api.datastore.Key bk, java.util.Date");
+		sq.declareParameters("com.google.appengine.api.datastore.Key uk, java.util.Date date");
 		
 		@SuppressWarnings("unchecked")
 		List<Subscription> ls = (List<Subscription>) sq.execute(user.getKey(), user.getLastEmail());
@@ -81,9 +79,20 @@ public class MailManager {
 			//fetch entries
 			List<BlogEntry> entries = (List<BlogEntry>) qEntry.execute(sub.getBlogKey() , user.getLastEmail());
 			
-			String title = null;
+			boolean title = false;
 			for(BlogEntry entry : entries){
-				if (title == null) title = entry.getBlogTitle();
+				ismail = true;
+				if (!title) {
+					title = true;
+					email.append("\r\n");
+					email.append(entry.getBlogTitle());
+					email.append("\r\n");
+				}
+				email.append(" * ");
+				email.append(entry.getTitle());
+				email.append(" - ");
+				email.append(entry.getShortLink());
+				email.append("\r\n");
 			}
 		}
 		
