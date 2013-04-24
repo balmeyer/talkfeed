@@ -1,4 +1,4 @@
-<!-- Indices written at Thu, 18 Apr 2013 21:35:41 UTC -->
+<!-- Indices written at Fri, 19 Apr 2013 18:37:09 UTC -->
 
 <datastore-indexes>
 
@@ -6,6 +6,12 @@
     <datastore-index kind="Subscription" ancestor="false" source="auto">
         <property name="userKey" direction="asc"/>
         <property name="lastDate" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 2 times in query history -->
+    <datastore-index kind="BlogEntry" ancestor="false" source="auto">
+        <property name="blogKey" direction="asc"/>
+        <property name="pubDate" direction="asc"/>
     </datastore-index>
 
 </datastore-indexes>
