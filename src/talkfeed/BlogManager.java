@@ -113,6 +113,9 @@ public final class BlogManager {
 					pm.makePersistent(blog);
 					pm.currentTransaction().commit();
 				}
+			} else {
+				Logger.getLogger("updateBlog").log(Level.WARNING,
+						"blog not found : "  + link);
 			}
 		}
 		

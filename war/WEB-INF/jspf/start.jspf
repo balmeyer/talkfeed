@@ -19,7 +19,9 @@
   	<div id="global">
   		<div id="main">
   		
-  		<div id="header"><a href="/index.htm"><img src="/img/logo.png"/></a> <g:plusone  size="medium"></g:plusone></div>
+  		<div id="header"><a href="/index.htm"><img src="/img/logo.png"/></a> 
+  		<g:plusone  size="medium"></g:plusone></div>
+  		<div id="version">v 0.7.1</div> 
   		
   		<div class="subtitle">
   		<img src="/img/puce.png"/><a href="/help.htm">get started</a> 

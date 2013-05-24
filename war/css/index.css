@@ -23,6 +23,12 @@ body{
 	
 }
 
+#version {
+	font-size:12px;
+	color:#cacaca;
+	margin-left:20px;
+}
+
 #main{
 	text-align: left; /* on retablit l'alignement normal du texte */ 
 	margin-left:auto;
