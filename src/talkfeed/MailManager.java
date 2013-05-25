@@ -35,6 +35,8 @@ import talkfeed.data.User;
  */
 public class MailManager {
 
+	private static final String HOST = "http://localhost:8888/";
+	
 	/**
 	 * Send mail to user
 	 * @param id
@@ -50,7 +52,7 @@ public class MailManager {
 		
 		if (user.getLastEmail() == null){
 			Calendar cal = Calendar.getInstance();
-			cal.add(Calendar.HOUR, -(7 * 24));
+			cal.add(Calendar.HOUR, -(4 * 24));
 			user.setLastEmail(cal.getTime());
 		}
 		
@@ -60,6 +62,12 @@ public class MailManager {
 		
 		StringBuilder email = new StringBuilder();
 		
+		email.append("Hello ");
+		email.append(user.getId());
+		email.append("\r\n\r\nHere are your updates since ");
+		email.append(user.getLastEmail());
+		email.append("\r\n\r\n");
+		
 		//retrieve subscriptions
 		//fetch sub
 		Query sq = pm.newQuery(Subscription.class);
@@ -67,17 +75,17 @@ public class MailManager {
 		sq.declareParameters("com.google.appengine.api.datastore.Key uk, java.util.Date date");
 		
 		@SuppressWarnings("unchecked")
-		List<Subscription> ls = (List<Subscription>) sq.execute(user.getKey(), user.getLastEmail());
+		List<Subscription> ls = (List<Subscription>) sq.execute(user.getKey(),user.getLastEmail());
 		
 		//fetch new subscriptions
 		for(Subscription sub : ls){
 			//fetch entries
 			Query qEntry = pm.newQuery(BlogEntry.class);
 			qEntry.setFilter("blogKey == bk && pubDate > date");
-			sq.declareParameters("com.google.appengine.api.datastore.Key bk, java.util.Date");
+			qEntry.declareParameters("com.google.appengine.api.datastore.Key bk, java.util.Date date");
 			
 			//fetch entries
-			List<BlogEntry> entries = (List<BlogEntry>) qEntry.execute(sub.getBlogKey() , user.getLastEmail());
+			List<BlogEntry> entries = (List<BlogEntry>) qEntry.execute(sub.getBlogKey(),user.getLastEmail());
 			
 			boolean title = false;
 			for(BlogEntry entry : entries){
@@ -90,12 +98,21 @@ public class MailManager {
 				}
 				email.append(" * ");
 				email.append(entry.getTitle());
-				email.append(" - ");
-				email.append(entry.getShortLink());
+				email.append("\r\n  ");
+				email.append(entry.getLink());
 				email.append("\r\n");
 			}
+			qEntry.closeAll();
 		}
+		sq.closeAll();
 		
+		email.append("\r\nClick here to unsubscribe : ");
+		email.append(HOST);
+		email.append("stopmail/");
+		email.append(user.getKey().getId());
+		email.append("\r\nOr type 'email stop' to the talkfeed bot in gtalk.");
+		System.out.println(email.toString());
 	}
+
 	
 }

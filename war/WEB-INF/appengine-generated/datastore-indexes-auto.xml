@@ -1,4 +1,24 @@
+<<<<<<< HEAD
 <!-- Indices written at Fri, 24 May 2013 22:41:12 CEST -->
+=======
+<!-- Indices written at Fri, 19 Apr 2013 18:37:09 UTC -->
+>>>>>>> 7932187c73932cefc1ae25716c5c8ba0de8b2ca5
 
 <datastore-indexes/>
 
+<<<<<<< HEAD
+=======
+    <!-- Used 1 time in query history -->
+    <datastore-index kind="Subscription" ancestor="false" source="auto">
+        <property name="userKey" direction="asc"/>
+        <property name="lastDate" direction="asc"/>
+    </datastore-index>
+
+    <!-- Used 2 times in query history -->
+    <datastore-index kind="BlogEntry" ancestor="false" source="auto">
+        <property name="blogKey" direction="asc"/>
+        <property name="pubDate" direction="asc"/>
+    </datastore-index>
+
+</datastore-indexes>
+>>>>>>> 7932187c73932cefc1ae25716c5c8ba0de8b2ca5
