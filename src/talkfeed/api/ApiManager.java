@@ -8,6 +8,7 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import talkfeed.BlogManager;
 import talkfeed.cache.BlogCache;
 import talkfeed.cache.SubscriptionCache;
 import talkfeed.data.Blog;
@@ -105,6 +106,22 @@ public class ApiManager {
 		return blogs;
 	}
 	
+	/**
+	 * Add a blog
+	 * @param link
+	 * @return
+	 */
+	public Blog blogAdd(String link){
+		//TODO add blog without checking the page
+		BlogManager bm = BlogManager.getInstance();
+		
+		return bm.getOrCreateSource(link);
+	}
+	
+	/**
+	 * Return user key
+	 * @return
+	 */
 	private Key getUserKey(){
 		if (this.userKey == null){
 			Query q = getPersitence().newQuery(User.class);
