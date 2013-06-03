@@ -13,7 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package talkfeed.blog;
+package talkfeed.feed;
 
 import java.util.Date;
 

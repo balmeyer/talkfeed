@@ -28,6 +28,16 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/tasks/*</url-pattern>
 	</servlet-mapping>
 	
+		<servlet>
+		<servlet-name>api</servlet-name>
+		<servlet-class>talkfeed.web.servlet.ApiServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>api</servlet-name>
+		<url-pattern>/api/*</url-pattern>
+	</servlet-mapping>
+	
 	<!-- SPRING 3.0 -->
 	<servlet>
 		<servlet-name>dispatcher</servlet-name>

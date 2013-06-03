@@ -24,6 +24,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jdo.PersistenceManager;
+
+import talkfeed.data.Blog;
+import talkfeed.data.DataManagerFactory;
+
 /**
  * Cache managing for blog updates.
  * 
@@ -69,6 +74,28 @@ public class BlogCache {
 		}
 	}
 
+	/**
+	 * Return blog in cache
+	 * @param id
+	 * @return
+	 */
+	public static Blog getBlog(long id){
+		String key = "BLOG_" + id;
+		
+		Blog blog = (Blog) CacheService.get(key);
+		
+		if (blog == null){
+			PersistenceManager pm = DataManagerFactory.getInstance().newPersistenceManager();
+			
+			blog = pm.getObjectById(Blog.class , id);
+			if (blog != null){
+				CacheService.put(key, blog);
+			}
+		}
+		
+		return blog;
+	}
+	
 	public static List<Long> getActiveBlogsToUpdate(int max) {
 		refresh();
 

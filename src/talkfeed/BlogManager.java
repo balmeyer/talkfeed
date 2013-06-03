@@ -27,9 +27,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import talkfeed.QueuedTask.TaskType;
-import talkfeed.blog.Channel;
-import talkfeed.blog.FeedItem;
-import talkfeed.blog.FeedManager;
 import talkfeed.cache.BlogCache;
 import talkfeed.cache.SubscriptionCache;
 import talkfeed.cache.UserPresence;
@@ -38,6 +35,9 @@ import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
+import talkfeed.feed.Channel;
+import talkfeed.feed.FeedItem;
+import talkfeed.feed.FeedManager;
 import talkfeed.utils.DocumentLoader;
 import talkfeed.utils.TextTools;
 
