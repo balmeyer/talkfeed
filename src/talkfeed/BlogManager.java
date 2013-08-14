@@ -16,23 +16,28 @@
 
 package talkfeed;
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import talkfeed.QueuedTask.TaskType;
-import talkfeed.blog.Channel;
-import talkfeed.blog.FeedItem;
-import talkfeed.blog.FeedManager;
+import talkfeed.cache.BlogCache;
+import talkfeed.cache.SubscriptionCache;
+import talkfeed.cache.UserPresence;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
+import talkfeed.feed.Channel;
+import talkfeed.feed.FeedItem;
+import talkfeed.feed.FeedManager;
 import talkfeed.utils.DocumentLoader;
 import talkfeed.utils.TextTools;
 
@@ -44,8 +49,9 @@ import talkfeed.utils.TextTools;
  */
 public final class BlogManager {
 
-	private static final int MIN_INTERVAL = 120 ; //2 hours
-	private static final int MAX_INTERVAL = (60 * 24); //1 day
+	private static final int MIN_INTERVAL = 60 ; //1 hour
+	private static final int MAX_INTERVAL = (60 * 4); //4 days
+	
 	/**
 	 * Get instance of BlogManager
 	 * @return
@@ -73,9 +79,10 @@ public final class BlogManager {
 		link = TextTools.purgeLink(link);
 		
 		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
 		
 		//find if blog already exists in database
-		Blog blog = dm.getBlogFromLink(link);
+		Blog blog = dm.getBlogFromLink(pm , link);
 
 		if (blog == null) {
 			//blog does not exist : load content to parse it
@@ -94,7 +101,7 @@ public final class BlogManager {
 			//test if rss information hase been found
 			if (rss != null){
 				//check again if blog exists with given link
-				blog = dm.getBlogFromLink(rss);
+				blog = dm.getBlogFromLink(pm , rss);
 				//actually create new blog in database
 				if (blog == null){
 					blog = new Blog();
@@ -102,10 +109,18 @@ public final class BlogManager {
 					blog.setNextUpdate(now);
 					blog.setLink(link);
 					blog.setRss(rss);
-					dm.save(blog);
+					pm.currentTransaction().begin();
+					pm.makePersistent(blog);
+					pm.currentTransaction().commit();
 				}
+			} else {
+				Logger.getLogger("updateBlog").log(Level.WARNING,
+						"blog not found : "  + link);
 			}
 		}
+		
+		pm.close();
+		pm = null;
 
 		return blog;
 	}
@@ -114,6 +129,7 @@ public final class BlogManager {
 	/**
 	 * Update feed's blogs.
 	 */
+	@Deprecated
 	public void updateBlogs(int nbMax){
 		if (nbMax <=0) return;
 		
@@ -149,14 +165,10 @@ public final class BlogManager {
 	 * Update blog only when user is present
 	 * @param max
 	 */
-	public void updateActiveBlog(int max){
-		//TODO implement this
+	public void updateActiveBlogs(int max){
 		
-		List<Long> blogToUpdate = new ArrayList<Long>();
-		
-		//TODO get active user
-		
-		//TODO get subscriptions
+		//fetch list from Cache
+		List<Long> blogToUpdate = BlogCache.getActiveBlogsToUpdate(max);
 		
 		//to update
 		for(Long id : blogToUpdate){
@@ -205,13 +217,17 @@ public final class BlogManager {
 		if (result != null && result.isUpdate()) 
 			blog.setLatestEntry(result.getLastestEntryDate());
 		
+		String messageLog = "";
+		
 		//build nextUpdate
 		//if no new update : increase interval
 		int newInterval = blog.getRefreshInterval();
 		if (result != null && result.isUpdate()){
 			newInterval = newInterval / 2;
+			messageLog = "Blog updated [" + blog.getTitle() + "]"; 
 		} else {
 			newInterval = newInterval * 2;
+			messageLog = "No new update [" + blog.getTitle() + "]"; 
 		}
 		
 		if (newInterval <= MIN_INTERVAL) newInterval = MIN_INTERVAL; 
@@ -225,6 +241,41 @@ public final class BlogManager {
 		
 		pm.flush();
 		pm.close();
+		
+		BlogCache.setNextUpdate(blog.getKey().getId(), newInterval);
+		
+		Logger.getLogger("updateBlog").log(Level.INFO,
+				messageLog);
+	}
+	
+	/**
+	 * Active blogs regarding users presence.
+	 */
+	public void activeBlogsFromUserPresence(){
+		
+		int nb = 0;
+		
+		try {
+			Collection<String> users = UserPresence.listUsers();
+			
+			//for each present user : fetch subscriptions and active blog
+			for(String user : users){
+				//fetch subscriptions
+				Collection<Long> blogs = SubscriptionCache.getUserBlogs(user);
+				for(long id : blogs){
+					BlogCache.setBlogIsActive(id);
+					nb++;
+				}
+			}
+			
+		}  finally {
+			//release datastore
+			SubscriptionCache.releaseDataStore();
+		}
+		
+		Logger.getLogger("UserService").info(
+				nb +  " blog(s) active");
+		
 	}
 	
 	/**
@@ -283,7 +334,7 @@ public final class BlogManager {
 		
 		Query q = pm.newQuery(BlogEntry.class);
 		q.setFilter("creaDate < date");
-		q.setRange(0,1000);
+		q.setRange(0,50);
 		q.declareParameters("java.util.Date date");
 		
 		Calendar cdat = Calendar.getInstance();
@@ -299,11 +350,7 @@ public final class BlogManager {
 			pm.currentTransaction().commit();
 			nb++;
 		}
-		
-		
 
-
-		
 		pm.close();
 		
 		return nb;
@@ -416,8 +463,6 @@ public final class BlogManager {
 					this.lastestEntryDate = newEntryDate;
 				}
 			}
-			
-			
 		}
 	
 	}

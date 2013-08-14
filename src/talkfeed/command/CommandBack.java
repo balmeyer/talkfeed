@@ -63,7 +63,7 @@ public class CommandBack implements Command {
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
 		
-		User user = dm.getUserFromId(jid);
+		User user = dm.getUserFromId(pm , jid);
 		
 		Query q = pm.newQuery(Subscription.class);
 		q.setFilter("userKey == uk");
@@ -71,7 +71,6 @@ public class CommandBack implements Command {
 		
 		@SuppressWarnings("unchecked")
 		List<Subscription> list = (List<Subscription>) q.execute(user.getKey());
-		
 		
 		for(Subscription s : list){
 			pm.currentTransaction().begin();
@@ -82,8 +81,8 @@ public class CommandBack implements Command {
 		}
 		
 		pm.flush();
-		
 		pm.close();
+		pm = null;
 		
 		TalkService.sendMessage(user.getId(), "rollback done : " + time + " " + unit);
 

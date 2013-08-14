@@ -16,6 +16,7 @@
 
 package talkfeed.data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -31,7 +32,12 @@ import com.google.appengine.api.datastore.Key;
  *
  */
 @PersistenceCapable
-public class Blog {
+public class Blog implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)

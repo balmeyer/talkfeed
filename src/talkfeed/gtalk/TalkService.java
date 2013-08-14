@@ -86,7 +86,7 @@ public class TalkService {
 	public static final Presence getPresence(JID jid) {
 		XMPPService xmpp = XMPPServiceFactory.getXMPPService();
 		
-		return xmpp.getPresence(jid);
+		return xmpp.getPresence(jid, new JID("talkfeed@appspot.com"));
 	}
 	
 	public static final Message parseMessage(HttpServletRequest req) throws IOException{

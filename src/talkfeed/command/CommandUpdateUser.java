@@ -1,6 +1,8 @@
 package talkfeed.command;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import talkfeed.UserManager;
 
@@ -20,16 +22,20 @@ public class CommandUpdateUser implements Command  {
 		//update by jid (email)
 		String jid = args.get("jid");
 
-		if(sid != null){
-			long id = Long.parseLong(sid);
-			UserManager us = new UserManager();
-			us.updateUser(id);
-		}
+		long id = 0;
 		
-		if(jid != null){
-			UserManager us = new UserManager();
-			us.updateUser(jid);
+		if(sid != null){
+			id = Long.parseLong(sid);
 		}
+	
+		try {
+			UserManager us = new UserManager();
+			us.updateUser(id, jid);
+		} catch (Exception ex){
+			Logger.getLogger("CommandUpdateUser").log(Level.SEVERE,
+					"Error update " + jid,ex);
+		}
+	
 
 		
 	}

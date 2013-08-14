@@ -26,6 +26,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import talkfeed.QueuedTask.TaskType;
+import talkfeed.cache.CacheService;
+import talkfeed.cache.UserPresence;
 import talkfeed.data.Blog;
 import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
@@ -35,8 +37,8 @@ import talkfeed.data.User;
 import talkfeed.gtalk.GTalkBlogNotification;
 import talkfeed.gtalk.TalkService;
 import talkfeed.url.UrlShortenFactory;
-import talkfeed.utils.CacheService;
 import talkfeed.utils.Logs;
+import talkfeed.utils.TextTools;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.xmpp.JID;
@@ -107,11 +109,11 @@ public class UserManager {
 	}
 
 	/**
-	 * Send notif for present users
+	 * Send notification for present users
 	 */
 	public void updatePresentUsers(){
 
-		Collection<String> users = UserPresence.listPresence(10);
+		Collection<String> users = UserPresence.listUserByNextUpdate(14);
 		for(String user : users){
 			//build task for queuing
 			QueuedTask task = new QueuedTask();
@@ -126,7 +128,10 @@ public class UserManager {
 	 * 
 	 * @param id
 	 */
-	public void updateUser(long id) {
+	public void updateUser(long id, String email) {
+		
+		email = TextTools.cleanJID(email);
+		
 		// Nowadays
 		Date now = Calendar.getInstance().getTime();
 
@@ -135,8 +140,29 @@ public class UserManager {
 				.newPersistenceManager();
 
 		//fetch user from his jabber id
-		User user = (User) this.currentManager.getObjectById(User.class, id);
+		User user = null;
+		if (id >0) {
+			//fetch by id
+			user = (User) this.currentManager.getObjectById(User.class, id);
+		} else {
+			//find by email
+			if(email != null){
+				
+				Query qUser = this.currentManager.newQuery(User.class);
+				qUser.setFilter("id == email");
+				qUser.declareParameters("String email");
+				qUser.setRange(0, 1);
+				qUser.setUnique(true);
 
+				user = (User) qUser.execute(email);
+			} 
+		}
+
+		//user error
+		if (user == null){
+			throw new IllegalArgumentException("NO user found : id=" + id + ", email=" +email);
+		}
+		
 		// next update
 		int minuteNextUpdate = user.getInterval();
 		if (minuteNextUpdate < 10)
@@ -206,14 +232,20 @@ public class UserManager {
 					this.currentManager.flush();
 					this.currentManager.currentTransaction().commit();
 					break;
+				}else {
+					//nothing to update
+					Logger.getLogger("UserService").info(
+							"user " + user.getId() + " present but nothing to update.");
 				}
 
-			}
+			} 
 
 			q.closeAll();
 
 		} else {
 			minuteNextUpdate = 30;
+			//remove from presence
+			UserPresence.setPresence(user.getId(), false);
 			Logger.getLogger("UserService").info(
 					"user " + user.getId() + " not present");
 		}
@@ -223,6 +255,7 @@ public class UserManager {
 		Calendar nextTime = Calendar.getInstance();
 		nextTime.add(Calendar.MINUTE, minuteNextUpdate);
 		user.setNextUpdate(nextTime.getTime());
+		UserPresence.setNextUpdate(user.getId(), minuteNextUpdate);
 
 		// flush
 		this.currentManager.currentTransaction().begin();
@@ -233,7 +266,13 @@ public class UserManager {
 		this.currentManager = null;
 	}
 
+	/**
+	 * Update when user id is unkwnown
+	 * @param email
+	 */
 	public void updateUser(String email){
+		
+		email = TextTools.cleanJID(email);
 		
 		// test user presence
 		JID jid = new JID(email);
@@ -246,10 +285,9 @@ public class UserManager {
 			UserPresence.removeUser(email);
 			return;
 		}
-		//TODO update by email
 		
-		
-		
+		this.updateUser(0, email);
+
 		
 		//IF UPDATE : set user has received update !
 		int minutes = (hasNewSub) ? 10 : 20 ;
@@ -287,7 +325,10 @@ public class UserManager {
 	 * @param blogId
 	 * @return
 	 */
-	public boolean removeUserSubscription(String email, long blogId) {
+	public boolean removeUserSubscription(String email, final long blogId) {
+		
+		email = TextTools.cleanJID(email);
+		
 		DataManager dm = DataManagerFactory.getInstance();
 		PersistenceManager pm = dm.newPersistenceManager();
 

@@ -18,8 +18,6 @@ package talkfeed.command;
 import java.util.Map;
 
 import talkfeed.UserManager;
-import talkfeed.data.DataManagerFactory;
-import talkfeed.data.User;
 
 @CommandType("next")
 public class CommandNext implements Command {
@@ -32,10 +30,8 @@ public class CommandNext implements Command {
 		
 		if (jid == null) return;
 		
-		User user = DataManagerFactory.getInstance().getUserFromId(jid);
-
 		UserManager userserv = new UserManager();
-		userserv.updateUser(user.getKey().getId());
+		userserv.updateUser(0,jid);
 	}
 
 }

@@ -33,9 +33,9 @@ public class StoreDataManager implements DataManager{
 	private static final PersistenceManagerFactory pmFactory = JDOHelper.getPersistenceManagerFactory("datamanager");
 	
 	@Override
-	public User getUserFromId(String id){
+	public User getUserFromId(PersistenceManager pm , String id){
 		User user = null;
-		PersistenceManager pm = this.createPersistenceManager();
+
 		Query q = pm.newQuery(User.class);
 		q.setFilter("id == jid");
 		q.declareParameters("java.lang.String jid");
@@ -46,32 +46,31 @@ public class StoreDataManager implements DataManager{
 		if (list.size() > 0){
 			user = list.get(0);
 		}
+		q.closeAll();
 		
-		pm.close();
 		
 		return user;
 	}
 	
 	@Override
-	public Subscription getSubscription(User user, Blog blog){
+	public Subscription getSubscription(PersistenceManager pm, User user, Blog blog){
 		
 		Subscription sub = null;
-		
-		PersistenceManager pm = this.createPersistenceManager();
+
 		Query q = pm.newQuery(Subscription.class);
+		
 		q.setFilter("userKey == uk && blogKey == bk");
 		q.declareParameters("com.google.appengine.api.datastore.Key uk , "
 				+ "com.google.appengine.api.datastore.Key bk");
-		
-		
+
 		@SuppressWarnings("unchecked")
 		List<Subscription> list = (List<Subscription>) q.execute(user.getKey(), blog.getKey());
 		
 		if (list.size() > 0){
 			sub = list.get(0);
 		}
-		
-		pm.close();
+		q.closeAll();
+		q = null;
 		
 		return sub;
 	}
@@ -81,10 +80,9 @@ public class StoreDataManager implements DataManager{
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public Blog getBlogFromLink(String link){
+	public Blog getBlogFromLink(PersistenceManager pm , String link){
 		Blog blog = null;
-		PersistenceManager pm = this.createPersistenceManager();
-		
+
 		//try direct link
 		Query q = pm.newQuery(Blog.class);
 		q.setFilter("link == '" + link +"'");
@@ -105,81 +103,19 @@ public class StoreDataManager implements DataManager{
 				blog = blogs.get(0);
 			}
 		}
-		
-		pm.close();
+		q.closeAll();
+		q = null; 
 		
 		return blog;
 	}
 	
-	@Override
-	public void updateUserActivity(String id, boolean isRunning){
-		PersistenceManager pm = this.createPersistenceManager();
-		pm.currentTransaction().begin();
-		//load user
-		User user = null;
-		Query q = pm.newQuery(User.class);
-		q.setFilter("id == jid");
-		q.declareParameters("java.lang.String jid");
-		
-		@SuppressWarnings("unchecked")
-		List<User> list = (List<User>) q.execute(id);
-		
-		if (list.size() > 0){
-			user = list.get(0);
-		}
-		
-		if (user != null){
-			user.setPaused(!isRunning);
-		}
-		pm.flush();
-		
-		pm.currentTransaction().commit();
-		
-		pm.close();
-	}
-	
-	@Override
-	public void updateUserInterval(String id, int minutes){
-		PersistenceManager pm = this.createPersistenceManager();
-		
-		pm.currentTransaction().begin();
-		
-		//load user
-		User user = null;
-		Query q = pm.newQuery(User.class);
-		q.setFilter("id == jid");
-		q.declareParameters("java.lang.String jid");
-		
-		@SuppressWarnings("unchecked")
-		List<User> list = (List<User>) q.execute(id);
-		
-		if (list.size() > 0){
-			user = list.get(0);
-		}
-		
-		if (user != null){
-			user.setInterval(minutes);
-		}
-		pm.flush();
-		pm.currentTransaction().commit();
-		
-		pm.close();
-	}
+
 	
 	@Override
 	public PersistenceManager newPersistenceManager(){
 		return this.createPersistenceManager();
 	}
 	
-	@Override
-	public void save(Object obj){
-		PersistenceManager pm = this.createPersistenceManager();
-		pm.currentTransaction().begin();
-		pm.makePersistent(obj);
-		pm.currentTransaction().commit();
-		pm.close();
-	}
-
 	/**
 	 * Create persistence manager
 	 * @return

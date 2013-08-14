@@ -27,8 +27,6 @@ import talkfeed.UserManager;
 @CommandType("refreshsubscriptions")
 public class CommandRefreshSubscriptions implements Command {
 
-	private static final int NB_MAX = 10;
-	
 	@Override
 	public void execute(Map<String, String> args) {
 		
@@ -37,8 +35,8 @@ public class CommandRefreshSubscriptions implements Command {
 		serv.sendNotifications(NB_MAX ); */
 		
 		UserManager serv = new UserManager();
-		serv.updateUsers(NB_MAX);
-		
+		//serv.updateUsers(NB_MAX);
+		serv.updatePresentUsers();
 	}
 
 }
