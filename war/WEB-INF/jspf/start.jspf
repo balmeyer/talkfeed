@@ -8,32 +8,46 @@
 <html>
 <head>
 <title>TalkFeed - RSS Feeds in GTalk</title>
-<script language="javascript" type="text/javascript"
-	src="/js/jquery-1.6.2.min.js"></script>
-<script language="javascript" type="text/javascript"
-	src="/js/talkfeed.js"></script>
+
+	
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="/css/index.css" />
 <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script>
 </head>
 <body>
-  	<div id="global">
-  		<div id="main">
+  	<div class="container">
   		
-  		<div id="header"><a href="/index.htm"><img src="/img/logo.png"/></a> <g:plusone  size="medium"></g:plusone></div>
-  		
-  		<div class="subtitle">
-  		<img src="/img/puce.png"/><a href="/help.htm">get started</a> 
-  		<img src="/img/puce.png"/><a href="/account.htm">account</a> 
-  		  <c:if test="${cookie.username != null}">
-  			<img src="/img/puce.png"/> <a href="/disconnect.htm">sign out</a>
-  		  </c:if>
-  		  
+  		<!-- ==================================================== -->
+  		<!-- HEADER -->
+  		<div class="header">
+  			<div class="row">
+  				<div class="col-lg-3"></div>
+  				
+  				<div class="col-lg-6">
+		  			<a href="/index.htm"><img src="/img/logo.png"/></a>
+		  			
+		  		</div>
+		  		
+				<div class="col-lg-1"><g:plusone  size="medium"></g:plusone></div>
+  			</div>
 
-  		  
-  		</div>
-  		
+			<div class="row">
+				<div class="col-lg-3"></div>
+				<div class="col-lg-6 text-center">
 
-  		
-  		
-  		<div id="content"><!-- start content -->
+				  		<a href="/help.htm" class="btn btn-success">get started</a> 
+				  
+				  		<a href="/account.htm" class="btn btn-success"">account</a>
+
+				  		  <c:if test="${cookie.username != null}">
+				  			<a href="/disconnect.htm" class="btn btn-success"">sign out</a>
+				  		  </c:if>
+
+
+	  			</div>
+	  			<div class="col-lg-3"></div>
+	  		</div>
+
+  		</div><!-- END HEADER -->
+
   		
