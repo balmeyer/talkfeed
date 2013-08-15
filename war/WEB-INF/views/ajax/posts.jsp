@@ -5,11 +5,16 @@
 	pageEncoding="UTF-8"%>
 
 
-<div>
+<ul class="list-group">
 	<c:forEach items="${posts}" var="p">
-		<div id="post_${p.key.id}" class="post">
+		<li id="post_${p.key.id}" class="list-group-item">
+			<p class="text-left">
 			<a href="${p.link}" target="out">${p.title}</a> 
-			<div class="lastDate"><fmt:formatDate value="${p.pubDate}" pattern="yyyy-MM-dd hh:mm:ss"/></div>
-		</div>
+			
+			<span class="label label-default">
+			<fmt:formatDate value="${p.pubDate}" pattern="yyyy-MM-dd hh:mm:ss" />
+			</span>
+			</p>
+		</li>
 	</c:forEach>
-</div>
+</ul>

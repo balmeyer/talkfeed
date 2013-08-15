@@ -4,3 +4,15 @@ h4 , h5 {
 img {
 	margin:10px;
 }
+
+.spacer{
+	margin-top:10px;
+}
+
+.round-grey {
+	background: #e9e9e9;
+	padding: 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}

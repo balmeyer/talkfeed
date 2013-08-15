@@ -6,9 +6,9 @@
 		<div class="row">
 			<div class="col-lg-3"></div>
 			<div class="col-lg-6 text-center">
-				<a class="btn btn-success" href="http://code.google.com/p/talkfeed/" target="googlecode">About TalkFeed project</a> 
-				<a class="btn btn-success" href="http://code.google.com/p/talkfeed/issues/list" target="googlecode">Issues</a>
-				<a class="btn btn-success" href="http://code.google.com/p/talkfeed/source/browse/" target="googlecode">Source</a>
+				<a class="btn btn-default btn-sm" href="http://code.google.com/p/talkfeed/" target="googlecode">About TalkFeed project</a> 
+				<a class="btn btn-default btn-sm" href="http://code.google.com/p/talkfeed/issues/list" target="googlecode">Issues</a>
+				<a class="btn btn-default btn-sm" href="http://code.google.com/p/talkfeed/source/browse/" target="googlecode">Source</a>
 			</div>
 			<div class="col-lg-3"></div>
 		</div>
