@@ -9,7 +9,7 @@
 				<img src="/img/puce.png"/> <a href="/inviteme.htm">get invited</a>
 		</c:if>
 <c:if test="${showInvitation == false}">
-	Your subscriptions : <br/>
+	<h3>Your subscriptions : </h3>
 </c:if>
 
 	

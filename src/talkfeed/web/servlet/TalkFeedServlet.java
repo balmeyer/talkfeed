@@ -26,8 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import talkfeed.MessageDispatcher;
 import talkfeed.UserManager;
-import talkfeed.gtalk.TalkService;
 import talkfeed.utils.TextTools;
+import talkfeed.xmpp.TalkService;
 
 import com.google.appengine.api.xmpp.Message;
 import com.google.appengine.api.xmpp.Presence;
@@ -74,26 +74,17 @@ public class TalkFeedServlet extends HttpServlet {
 		//PRESENCE STATUS
 
 		
-		//PRESENCE AVAILABE
-		if(action.equals("presenceavailable")){
+		//PRESENCE 
+		if(action.contains("presence")){
 			UserManager um = new UserManager();
 			
 			Presence presence = TalkService.getPresence(req);
 			
 			String user = TextTools.cleanJID(presence.getFromJid().getId());
-			um.setPresence(user, true);
+			um.setUserPresence(user, presence);
 		}
 		
-		//PRESENCE
-		if(action.equals("presenceunavailable")){
-			UserManager um = new UserManager();
-			
-			Presence presence = TalkService.getPresence(req);
-			
-			String user = TextTools.cleanJID(presence.getFromJid().getId());
-			
-			um.setPresence(user, false);
-		}
+
 	}
 	
 	

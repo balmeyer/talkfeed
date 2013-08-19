@@ -39,8 +39,8 @@ import talkfeed.data.BlogEntry;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
-import talkfeed.gtalk.TalkService;
 import talkfeed.utils.TextTools;
+import talkfeed.xmpp.TalkService;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.User;
@@ -65,7 +65,7 @@ public class AccountController {
 			for (Cookie c : req.getCookies()) {
 				if (c.getName().equalsIgnoreCase("username")
 						&& c.getValue() != null) {
-					return "redirect:/account.htm";
+					//return "redirect:/account.htm";
 				}
 			}
 		}
@@ -260,15 +260,34 @@ public class AccountController {
 	public String inviteMe(HttpServletRequest req, HttpServletResponse resp)
 			throws Exception {
 
-		UserService userService = UserServiceFactory.getUserService();
-		User user = userService.getCurrentUser();
+		String email = null;
+		String method = null;
+		
+		email = req.getParameter("jid");
+		
+		if (email == null){
+		
+			UserService userService = UserServiceFactory.getUserService();
+			User user = userService.getCurrentUser();
+			
+			if (user != null) {
+				email = user.getEmail();
+				method = "gtalk";
+			} else {
+				//redirection
+				resp.sendRedirect(userService.createLoginURL("/inviteme.htm"));
+				return null;
+			}
+		} else {
+			method = "jabber";
+		}
 
-		if (user != null) {
+		if (email != null) {
 
-			JID jid = new JID(user.getEmail());
+			JID jid = new JID(email);
 			TalkService.invite(jid);
 
-			resp.addCookie(new Cookie("invited", "true"));
+			resp.addCookie(new Cookie("invited", method));
 
 			return "page/invited";
 

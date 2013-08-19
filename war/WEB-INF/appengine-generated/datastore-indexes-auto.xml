@@ -1,11 +1,4 @@
-<!-- Indices written at Thu, 15 Aug 2013 01:09:49 CEST -->
+<!-- Indices written at Mon, 19 Aug 2013 21:54:51 CEST -->
 
-<datastore-indexes>
+<datastore-indexes/>
 
-    <!-- Used 1 time in query history -->
-    <datastore-index kind="BlogEntry" ancestor="false" source="auto">
-        <property name="blogKey" direction="asc"/>
-        <property name="pubDate" direction="desc"/>
-    </datastore-index>
-
-</datastore-indexes>

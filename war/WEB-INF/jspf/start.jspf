@@ -7,7 +7,7 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
-<title>TalkFeed - RSS Feeds in GTalk</title>
+<title>TalkFeed - RSS Feeds in GTalk and Jabber clients.</title>
 
 	
 <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
@@ -36,7 +36,7 @@
 
 				  		<a href="/help.htm" class="btn btn-success">get started</a> 
 				  
-				  		<a href="/account.htm" class="btn btn-success"">account</a>
+				  		<a href="/account.htm" class="btn btn-success">GTalk account</a>
 
 				  		  <c:if test="${cookie.username != null}">
 				  			<a href="/disconnect.htm" class="btn btn-success"">sign out</a>

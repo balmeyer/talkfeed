@@ -22,7 +22,7 @@ import javax.jdo.PersistenceManager;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.User;
-import talkfeed.gtalk.TalkService;
+import talkfeed.xmpp.TalkService;
 
 /**
  * manning account

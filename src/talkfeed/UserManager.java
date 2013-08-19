@@ -34,11 +34,11 @@ import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
-import talkfeed.gtalk.GTalkBlogNotification;
-import talkfeed.gtalk.TalkService;
 import talkfeed.url.UrlShortenFactory;
 import talkfeed.utils.Logs;
 import talkfeed.utils.TextTools;
+import talkfeed.xmpp.JabberBlogNotification;
+import talkfeed.xmpp.TalkService;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.xmpp.JID;
@@ -57,16 +57,44 @@ public class UserManager {
 	private PersistenceManager currentManager;
 
 	/**
+	 * Get or create user
+	 * @param jid
+	 * @return
+	 */
+	public User getOrCreateUser(String jid){
+		
+		DataManager dm = DataManagerFactory.getInstance();
+		PersistenceManager pm = dm.newPersistenceManager();
+		
+		User user = dm.getUserFromId(pm , jid);
+		if (user == null){
+			user = new User();
+			user.setId(jid);
+			user.setDateCrea(new Date());
+			user.setNextUpdate(new Date());
+			pm.currentTransaction().begin();
+			pm.makePersistent(user);
+			pm.currentTransaction().commit();
+		}
+		
+		
+		pm.close();
+		pm = null;
+		
+		return user;
+	}
+	
+	/**
 	 * Modify user presence in GTalk
 	 * @param id
 	 * @param presence
 	 */
-	public void setPresence(String id , boolean presence){
+	public void setUserPresence(String id , Presence presence){
 		if (id == null) return;
 		
 		Logs.info("Presence for ID : " + id);
 		
-		UserPresence.setPresence(id, presence);
+		UserPresence.setUserPresence(id, presence);
 	}
 	
 	/**
@@ -141,26 +169,21 @@ public class UserManager {
 
 		//fetch user from his jabber id
 		User user = null;
+		
 		if (id >0) {
 			//fetch by id
 			user = (User) this.currentManager.getObjectById(User.class, id);
 		} else {
 			//find by email
 			if(email != null){
-				
-				Query qUser = this.currentManager.newQuery(User.class);
-				qUser.setFilter("id == email");
-				qUser.declareParameters("String email");
-				qUser.setRange(0, 1);
-				qUser.setUnique(true);
-
-				user = (User) qUser.execute(email);
+				user = this.getOrCreateUser(email);
 			} 
 		}
 
 		//user error
 		if (user == null){
-			throw new IllegalArgumentException("NO user found : id=" + id + ", email=" +email);
+			throw new IllegalArgumentException("NO user found : id=" 
+						+ id + ", email=" +email);
 		}
 		
 		// next update
@@ -170,9 +193,10 @@ public class UserManager {
 
 		// test user presence
 		JID jid = new JID(user.getId());
-		Presence presence = TalkService.getPresence(jid);
-
-		if (presence != null && presence.isAvailable()) {
+		
+		boolean isAvailable = UserPresence.isUserAvailable(jid.getId());
+		
+		if (isAvailable) {
 			//user is present : do update !
 
 			// select subscriptions
@@ -243,11 +267,14 @@ public class UserManager {
 			q.closeAll();
 
 		} else {
+			/*
+			 * removed for XMPP issues
 			minuteNextUpdate = 30;
 			//remove from presence
-			UserPresence.setPresence(user.getId(), false);
+			UserPresence.setPresence(user.getId(), presence);
 			Logger.getLogger("UserService").info(
 					"user " + user.getId() + " not present");
+			*/
 		}
 
 		// next update
@@ -275,17 +302,12 @@ public class UserManager {
 		email = TextTools.cleanJID(email);
 		
 		// test user presence
-		JID jid = new JID(email);
-		Presence presence = TalkService.getPresence(jid);
+		//JID jid = new JID(email);
+		//boolean isAvailable = UserPresence.isUserAvailable(jid.getId());
 
 		//has a new subscription ?
 		boolean hasNewSub = false;
-		
-		if (presence == null || !presence.isAvailable()) {
-			UserPresence.removeUser(email);
-			return;
-		}
-		
+
 		this.updateUser(0, email);
 
 		
@@ -422,7 +444,7 @@ public class UserManager {
 			blogTitle = this.getBlogTitle(entry);
 
 		// build notification
-		GTalkBlogNotification notif = new GTalkBlogNotification();
+		JabberBlogNotification notif = new JabberBlogNotification();
 		notif.setBlogTitle(blogTitle);
 		notif.setJabberID(jabberId);
 		notif.setPostTitle(entry.getTitle());

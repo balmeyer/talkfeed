@@ -12,7 +12,7 @@ import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
 import talkfeed.data.Subscription;
 import talkfeed.data.User;
-import talkfeed.gtalk.TalkService;
+import talkfeed.xmpp.TalkService;
 
 @CommandType("back")
 public class CommandBack implements Command {

@@ -13,12 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package talkfeed.gtalk;
+package talkfeed.xmpp;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+
+import talkfeed.cache.UserPresence;
 
 import com.google.appengine.api.xmpp.JID;
 import com.google.appengine.api.xmpp.Message;
@@ -56,9 +58,14 @@ public class TalkService {
 
 		
 		Logger log = Logger.getLogger(TalkService.class.getName());
-		log.info(" send message to : " + jid.getId() + ". Presence : " + presence.isAvailable());
+		log.info(" send message to : " + jid.getId()
+				+ ". Presence : " + presence.isAvailable()
+				+ ". presence show : " + presence.getPresenceShow()
+				+ ". presence type : "+ presence.getPresenceType());
 		
-		if (presence.isAvailable()){
+		//
+		boolean isAvailable = UserPresence.isUserAvailable(jid.getId());
+		if (isAvailable){
 			
 			MessageBuilder mb = new MessageBuilder();
 			Message reply = mb.withRecipientJids(jid)
@@ -80,10 +87,10 @@ public class TalkService {
 	public static final void invite(JID jid){
 		XMPPService xmpp = XMPPServiceFactory.getXMPPService();
 		
-		xmpp.sendInvitation(jid);
+		xmpp.sendInvitation(jid, new JID("talkfeed@appspot.com"));
 	}
 	
-	public static final Presence getPresence(JID jid) {
+	public static final Presence getXmppPresence(JID jid) {
 		XMPPService xmpp = XMPPServiceFactory.getXMPPService();
 		
 		return xmpp.getPresence(jid, new JID("talkfeed@appspot.com"));
@@ -106,7 +113,8 @@ public class TalkService {
 		Presence presence = xmpp.parsePresence(req);
 		
 		Logger.getLogger("TalkService").info(
-				" getPresenceFrom : " + presence.getFromJid().getId() );
+				" getPresenceFrom : " + presence.getFromJid().getId()  + "("
+				+ presence.isAvailable() + ")");
 		/*
 		user = TextTools.cleanJID(presence.getFromJid().getId());*/
 		return presence;
@@ -116,7 +124,7 @@ public class TalkService {
 	 * Send notification
 	 * @param notif
 	 */
-	public static final void sendMessage(GTalkBlogNotification notif){
+	public static final void sendMessage(JabberBlogNotification notif){
 		StringBuilder sb = new StringBuilder();
 		sb.append('[');
 		sb.append(notif.getBlogTitle());

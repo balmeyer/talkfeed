@@ -26,7 +26,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import talkfeed.UserManager;
+import talkfeed.data.User;
 import talkfeed.utils.TextTools;
+
+import com.google.appengine.api.xmpp.Presence;
 
 
 /**
@@ -48,8 +52,13 @@ public class UserPresence {
 	 * @param jid
 	 * @param presence
 	 */
-	public static void setPresence(String jid, boolean presence){
+	public static void setUserPresence(String jid, Presence presence){
 
+		Logger.getLogger("TalkFeedServlet").log(Level.INFO,
+				"Presence : " + presence.isAvailable()
+		+ ". presence show : " + presence.getPresenceShow()
+		+ ". presence type : "+ presence.getPresenceType());
+		
 		refreshListWithCache();
 		
 		jid = TextTools.cleanJID(jid);
@@ -57,10 +66,15 @@ public class UserPresence {
 		UserData data = new UserData(jid);
 		
 		synchronized (KEY_CACHE_PRESENCE) {
-			if (presence){
+			if (presence.isAvailable()){
 				if (!users.contains(data)){
 					//add users
 					users.add(data);
+					//check if user exists
+					UserManager um = new UserManager();
+					User u = um.getOrCreateUser(jid);
+					Logger.getLogger("TalkFeedServlet").log(Level.INFO, 
+							"New presence : " + jid + " - user db : " + u);
 				}
 			} else {
 				//not present
@@ -72,6 +86,21 @@ public class UserPresence {
 			//save in cache
 			CacheService.put(KEY_CACHE_PRESENCE, users);
 		}
+	}
+	
+	/**
+	 * Returns true is user present in available list
+	 * @param jid
+	 * @return
+	 */
+	public static boolean isUserAvailable(String jid){
+		refreshListWithCache();
+		
+		jid = TextTools.cleanJID(jid);
+		
+		UserData data = new UserData(jid);
+		
+		return users.contains(data);
 	}
 	
 	public static Collection<String> listUserByNextUpdate(int max) {
@@ -164,17 +193,18 @@ public class UserPresence {
 		return null;
 	}
 	
+	/**
+	 * Refresh user list witch cache
+	 */
 	@SuppressWarnings("unchecked")
 	private static void refreshListWithCache(){
 		//try cache first
-		if (users.size() == 0){
-			Object tmp = CacheService.get(KEY_CACHE_PRESENCE);
-			if (tmp != null){
-				synchronized (KEY_CACHE_PRESENCE) {
-					users = (List<UserData>) tmp;
-				}
-				
+		Object tmp = CacheService.get(KEY_CACHE_PRESENCE);
+		if (tmp != null){
+			synchronized (KEY_CACHE_PRESENCE) {
+				users = (List<UserData>) tmp;
 			}
+			
 		}
 	}
 	
@@ -198,6 +228,11 @@ public class UserPresence {
 			if (obj == null) return false;
 			UserData other = (UserData) obj;
 			return this.jid.equals(other.jid);
+		}
+		
+		@Override
+		public int hashCode(){
+			return this.jid.hashCode();
 		}
 		
 		@Override

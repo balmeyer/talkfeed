@@ -6,8 +6,8 @@
 	
 		<div class="col-lg-8 col-lg-offset-2 text-center round-grey">
 			
-			<div class="row ">
-				<div class="col-lg-8 text-center ">
+			<div class="row">
+				<div class="col-md-8 text-center ">
 					<h2>Subscribe to RSS feeds with Gtalk, receive updates by chat.</h2>
 					<h4><span class="label label-default">free</span>&nbsp;
 					<span class="label label-default">open source</span>&nbsp;
@@ -16,8 +16,25 @@
 					</h4>
 				</div>
 			
+				<div class="col-md-4">
+					<img src="/img/littleframe.png" class="img-responsive hidden-xs" />
+				</div>
+			</div>
+			
+			<div class="row">
 				<div class="col-lg-4">
-					<img src="/img/littleframe.png" class="img-responsive" />
+					<a href="/inviteme.htm" class="btn btn-info">Invite me with GTalk</a>
+				</div>
+				<div class="col-lg-8">
+					<form class="form-inline" role="form" action="/inviteme.htm" method="get">
+						<div class="form-group">
+						<label for="jid" class="sr-only">Invite me with Jabber : </label>
+						<input type="text" name="jid" id="jid" 
+							placeholder="Use a Jabber address" class="form-control"/>
+							
+						</div>
+						<input type="submit" value="Send" class="btn btn-info"/>
+					</form>
 				</div>
 			</div>
 		</div>

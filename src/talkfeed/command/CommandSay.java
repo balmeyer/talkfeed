@@ -2,8 +2,8 @@ package talkfeed.command;
 
 import java.util.Map;
 
-import talkfeed.gtalk.TalkService;
 import talkfeed.utils.Logs;
+import talkfeed.xmpp.TalkService;
 
 /**
  * Echo respons to user (test purpose)

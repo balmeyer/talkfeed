@@ -105,6 +105,11 @@ public class UserTask extends QueuedTask {
 				}
 			}
 			
+			//remove
+			if (mainArg.startsWith("remove") && words.length >1){
+				userTask.addParam("number", words[1]);
+			}
+			
 			//purge all
 			if (mainArg.endsWith("purge")){
 				userTask.type = TaskType.purge;

@@ -13,16 +13,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
  */
-package talkfeed.gtalk;
+package talkfeed.xmpp;
 
 import com.google.appengine.api.xmpp.JID;
 
 /**
  * New notification
- * @author vovau
+ * @author Balmeyer
  *
  */
-public class GTalkBlogNotification {
+public class JabberBlogNotification {
 
 	private JID jabberID;
 	

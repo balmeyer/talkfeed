@@ -15,16 +15,19 @@
  */
 package talkfeed.command;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import talkfeed.UserManager;
 import talkfeed.cache.SubscriptionCache;
 import talkfeed.data.DataManager;
 import talkfeed.data.DataManagerFactory;
+import talkfeed.data.Subscription;
 import talkfeed.data.User;
-import talkfeed.gtalk.TalkService;
+import talkfeed.xmpp.TalkService;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -39,6 +42,7 @@ public class CommandRemove implements Command {
 	@Override
 	public void execute(Map<String, String> args) {
 		String jid = args.get("id");
+		String number = args.get("arg2");
 		
 		if (jid != null){
 			DataManager dm = DataManagerFactory.getInstance();
@@ -46,7 +50,35 @@ public class CommandRemove implements Command {
 			
 			User u = dm.getUserFromId(pm,jid);
 			
-			Key subToRemove = u.getLastSubscriptionKey();
+			Key subToRemove = null;
+			
+			//no number : remove last subscription
+			if (number == null) subToRemove = u.getLastSubscriptionKey();
+			else {
+				int nb = 0;
+				try {
+					nb = Integer.valueOf(number);
+				} catch (Exception ex){
+					//bad number
+					return;
+				}
+				
+				//find sub
+				Query q = pm.newQuery(Subscription.class);
+				q.setFilter("userKey == k");
+				q.declareParameters("com.google.appengine.api.datastore.Key k");
+				
+				@SuppressWarnings("unchecked")
+				List<Subscription> subs = (List<Subscription>) q.execute(u.getKey());
+				int i = 1;
+				for(Subscription sub : subs){
+					if (nb == i) {
+						subToRemove = sub.getKey();
+						break;
+					}
+					i++;
+				}
+			}
 			
 			if (subToRemove != null){
 				UserManager serv = new UserManager();
