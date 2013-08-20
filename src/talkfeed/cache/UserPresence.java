@@ -84,7 +84,8 @@ public class UserPresence {
 			}
 			
 			//save in cache
-			CacheService.put(KEY_CACHE_PRESENCE, users);
+			saveListInCache();
+			
 		}
 	}
 	
@@ -157,6 +158,8 @@ public class UserPresence {
 	 */
 	public static void setNextUpdate(String jid, int minutes){
 		
+		refreshListWithCache();
+		
 		jid = TextTools.cleanJID(jid);
 		
 		if (minutes < 10) minutes = 10;
@@ -168,6 +171,17 @@ public class UserPresence {
 			next.add(Calendar.MINUTE, minutes);
 			data.nextUpdate = next.getTime();
 		}
+		
+		//replace data
+		synchronized (KEY_CACHE_PRESENCE) {
+			int index = users.indexOf(data);
+			if (index >=0){
+				users.set(index, data);
+			}
+		}
+		
+		saveListInCache();
+		
 	}
 	
 	/**
@@ -208,6 +222,15 @@ public class UserPresence {
 		}
 	}
 	
+	/**
+	 * Save modif
+	 */
+	private static void saveListInCache(){
+		synchronized (KEY_CACHE_PRESENCE) {
+			CacheService.put(KEY_CACHE_PRESENCE, users);
+		}
+	}
+	
 	private static class UserData implements Serializable,Comparable<UserData>{
 		/**
 		 * 
@@ -237,7 +260,7 @@ public class UserPresence {
 		
 		@Override
 		public String toString(){
-			return this.jid + "[when:" + this.presenceDate + "]";
+			return this.jid + "[when:" + this.presenceDate + ", next:" + this.nextUpdate + "]";
 		}
 
 		@Override
